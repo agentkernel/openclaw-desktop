@@ -88,7 +88,7 @@
   "bugs": {
     "url": "https://github.com/agentkernel/openclaw-desktop/issues"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "engines": {
     "node": ">=22.12.0"
   }

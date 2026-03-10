@@ -205,7 +205,7 @@ pnpm run package:win
 
 ## 许可证
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)
 
 <!-- SEO: OpenClaw Desktop, OpenClaw Windows, OpenClaw installer, OpenClaw desktop app, OpenClaw setup wizard,
 OpenClaw Windows installer, OpenClaw GUI, OpenClaw app for Windows, install OpenClaw on Windows, run OpenClaw locally,

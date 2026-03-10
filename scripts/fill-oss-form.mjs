@@ -24,7 +24,7 @@ const FORM_VALUES = {
   D2: 'OpenClaw Desktop',           // Name - 文档和安装器对外名称
   D4: 'openclaw-desktop',           // Handle - 与 artifact-configuration-slug 一致
   D6: 'Program',                    // Type - 桌面安装器应用
-  D8: 'MIT License - https://opensource.org/licenses/MIT',
+  D8: 'GPL-3.0 License - https://www.gnu.org/licenses/gpl-3.0',
   D10: 'https://github.com/agentkernel/openclaw-desktop',
   D12: 'https://github.com/agentkernel/openclaw-desktop',
   D14: 'https://github.com/agentkernel/openclaw-desktop/releases',
