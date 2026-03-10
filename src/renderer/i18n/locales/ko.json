@@ -1,0 +1,80 @@
+{
+  "wizard": {
+    "appName": "OpenClaw Desktop",
+    "setupWizard": "설정 마법사",
+    "steps": { "welcome": "시작", "model": "모델", "channel": "채널", "gateway": "게이트웨이", "complete": "완료" },
+    "nav": { "previous": "이전", "skip": "건너뛰기", "startSetup": "설정 시작", "next": "다음" },
+    "welcome": {
+      "title": "OpenClaw Desktop에 오신 것을 환영합니다",
+      "subtitle": "OpenClaw Desktop은 AI 어시스턴트를 네이티브 Windows 데스크톱 앱으로 패키지하며, 설치와 설정을 통합합니다. 이 마법사가 초기 구성을 안내합니다.",
+      "startHint": "아래의 \"설정 시작\"을 클릭하여 시작하세요",
+      "features": {
+        "model": { "title": "AI 모델 연동", "description": "Anthropic, OpenAI, Google 등 주요 제공업체 지원. 원클릭 API 키 설정." },
+        "channel": { "title": "다중 채널 지원", "description": "Feishu, Telegram 등 채널 어댑터 내장. 팀 커뮤니케이션 도구와 연동." },
+        "gateway": { "title": "로컬 게이트웨이", "description": "게이트웨이가 PC에서 안전하게 실행되며, 데이터가 외부로 전송되지 않습니다." },
+        "ready": { "title": "즉시 사용 가능", "description": "마법사로 몇 분 내 설정 완료. 설정 파일 수동 편집 불필요." }
+      }
+    },
+    "model": {
+      "title": "모델 설정", "subtitle": "AI 모델 제공업체를 선택하고 API 키를 설정하여 OpenClaw 대화를 활성화합니다.",
+      "provider": "모델 제공업체", "selectProvider": "제공업체 선택",
+      "moonshotEndpoint": "Moonshot 엔드포인트", "moonshotGlobal": "글로벌 (api.moonshot.ai)", "moonshotChina": "중국 (api.moonshot.cn)",
+      "apiKey": "API 키", "apiKeyStored": "API 키는 로컬에만 저장되며 업로드되지 않습니다.",
+      "oauthHint": "이 제공업체는 OAuth를 사용합니다. 이 컴퓨터에서 OpenClaw CLI를 통해 인증하세요.",
+      "noKeyHint": "이 제공업체는 로컬 자격 증명 또는 환경 설정을 사용합니다. API 키가 필요하지 않습니다.",
+      "defaultModel": "기본 모델", "selectModel": "모델 선택", "customModelId": "사용자 정의 모델 ID…",
+      "backToPresets": "프리셋으로 돌아가기", "enterModelId": "모델 ID 입력",
+      "providerId": "제공업체 ID", "apiBaseUrl": "API 기본 URL", "compatibility": "호환성",
+      "openaiCompatible": "OpenAI 호환", "anthropicCompatible": "Anthropic 호환",
+      "testConnection": "연결 테스트", "testing": "테스트 중…",
+      "connectionSuccess": "연결 성공", "connectionFailed": "연결 실패. API 키와 모델 ID를 확인하세요.",
+      "networkError": "테스트 서비스에 연결할 수 없습니다. 네트워크 연결을 확인하세요.",
+      "testHint": "\"연결 테스트\"를 클릭하여 API 키와 모델 설정을 확인합니다.",
+      "noTestHint": "이 제공업체는 마법사 내 자동 테스트를 지원하지 않습니다. 계속 진행하고 나중에 CLI로 확인할 수 있습니다.",
+      "showApiKey": "API 키 표시", "hideApiKey": "API 키 숨기기"
+    },
+    "channel": {
+      "title": "채널 설정", "subtitle": "Feishu, Telegram, WhatsApp 또는 Discord에 연결할 메시지 채널을 설정합니다.",
+      "feishu": { "title": "Feishu 채널", "description": "Feishu 개발 플랫폼에서 앱을 만들고 아래 매개변수를 가져오세요.", "openPlatform": "Feishu 플랫폼 열기", "appId": "App ID", "appSecret": "App Secret", "verificationToken": "Verification Token", "encryptKey": "Encrypt Key", "optional": "선택", "requiredDone": "Feishu 필수 필드가 입력되었습니다.", "requiredMissing": "Feishu 선택 시 App ID와 App Secret이 필요합니다." },
+      "telegram": { "title": "Telegram 채널", "description": "@BotFather를 통해 봇을 만들고 토큰을 붙여넣으세요.", "botToken": "Bot Token", "configDone": "Telegram Bot Token이 설정되었습니다.", "configMissing": "Telegram 선택 시 BotFather의 Bot Token이 필요합니다." },
+      "discord": { "title": "Discord 채널", "description": "Discord Developer Portal에서 앱을 만들고 Bot Token을 복사하세요.", "botToken": "Bot Token", "configDone": "Discord Bot Token이 설정되었습니다.", "configMissing": "Discord 선택 시 Developer Portal의 Bot Token이 필요합니다." },
+      "slack": { "title": "Slack 채널", "description": "Slack 앱을 설정합니다. Socket 모드는 Bot Token + App-Level Token, HTTP 모드는 Bot Token + Signing Secret을 사용합니다.", "connectionMode": "연결 모드", "socketMode": "Socket 모드", "httpMode": "HTTP (Events API)", "botToken": "Bot Token", "signingSecret": "Signing Secret", "appLevelToken": "App-Level Token", "configDone": "Slack 필수 필드가 입력되었습니다.", "configMissing": "Bot Token은 필수입니다. HTTP 모드에서는 Signing Secret도 필요합니다." },
+      "whatsapp": { "title": "WhatsApp (Baileys)", "description": "WhatsApp은 QR 코드 인증을 사용합니다. 설정 완료 후 Control UI에서 설정하세요." },
+      "skipChannels": "건너뛰고 WebChat만 사용", "skipHint": "나중에 설정에서 채널을 추가할 수 있습니다."
+    },
+    "gateway": {
+      "title": "게이트웨이 설정", "subtitle": "게이트웨이 서비스의 네트워크 포트, 바인드 주소 및 인증을 설정합니다.",
+      "port": "포트", "checkPort": "포트 확인", "checking": "확인 중…",
+      "portAvailable": "포트 {{port}} 사용 가능합니다.", "portOccupied": "포트 {{port}}가 사용 중입니다.",
+      "portRange": "포트는 1024–65535 범위여야 합니다.", "portCheckFailed": "포트 확인 실패. 다시 시도하세요.",
+      "useSuggested": "추천 포트 {{port}} 사용",
+      "bindAddress": "바인드 주소", "loopback": "루프백 (localhost만)", "loopbackDesc": "localhost (127.0.0.1)만 게이트웨이에 액세스할 수 있습니다. 가장 안전합니다.", "recommended": "추천",
+      "lan": "LAN", "lanDesc": "LAN의 다른 장치가 액세스할 수 있습니다. 인증 토큰으로 API를 보호하세요.",
+      "auto": "자동", "autoDesc": "게이트웨이가 바인드 주소를 자동으로 선택합니다. 공용 네트워크에 노출될 수 있습니다.",
+      "authToken": "인증 토큰", "regenerate": "재생성", "tokenHint": "게이트웨이 API 인증에 사용됩니다. 자동 생성된 값을 유지하는 것을 권장합니다."
+    },
+    "complete": {
+      "title": "설정 확인", "subtitle": "아래 설정을 검토하고 \"확인 및 시작\"을 클릭하여 설정을 완료합니다.",
+      "modelConfig": "모델 설정", "provider": "제공업체", "defaultModel": "기본 모델", "apiKey": "API 키",
+      "channelConfig": "채널 설정", "channel": "채널", "webChatOnly": "WebChat만 (채널 건너뜀)", "configureViaUI": "설정 후 Control UI에서 설정",
+      "gatewaySettings": "게이트웨이 설정", "port": "포트", "bindAddress": "바인드 주소", "authToken": "인증 토큰",
+      "confirmStart": "확인 및 시작", "retry": "재시도", "edit": "편집",
+      "writing": "설정 작성 중…", "starting": "게이트웨이 시작 중 (1-5분 소요). 잠시 기다려 주세요…",
+      "success": "게이트웨이 준비 완료, 리디렉션 중…", "startHint": "게이트웨이 시작에 1-5분이 소요될 수 있습니다. 이 창을 닫지 마세요.",
+      "errorConfig": "설정 작성 실패. 디스크 공간과 권한을 확인한 후 재시도하세요.",
+      "errorAuth": "자격 증명 작성 실패. 디스크 권한을 확인한 후 재시도하세요.",
+      "errorGateway": "게이트웨이 시작 실패. 포트가 사용 중인지 확인하거나 로그를 확인하세요.",
+      "errorGeneral": "작업 실패"
+    }
+  },
+  "shell": {
+    "dashboard": { "title": "대시보드", "subtitle": "게이트웨이 상태, 버전 정보 및 설정과 로그에 대한 빠른 액세스", "gateway": "게이트웨이", "versions": "버전", "quickActions": "빠른 작업", "logs": "로그", "logsDesc": "로그 디렉토리 열기", "diagnostics": "진단", "diagnosticsDesc": "진단 보고서 내보내기", "settings": "설정", "settingsDesc": "외관, 시작, 테마", "updates": "업데이트", "updatesDesc": "새 버전 확인", "skills": "스킬", "skillsDesc": "스킬 및 확장 관리", "llmApi": "LLM API", "llmApiDesc": "제공업체 및 인증 프로필", "recentError": "최근 오류", "errorHint": "게이트웨이 서비스가 예기치 않게 종료되었습니다. 로그를 확인하거나 재시도하세요." },
+    "settings": { "title": "설정", "closeToTray": "닫을 때 트레이로 최소화", "closeToTrayDesc": "창을 닫은 후에도 시스템 트레이에서 앱이 계속 실행됩니다", "autoStart": "로그인 시 시작", "autoStartDesc": "Windows 로그인 시 OpenClaw 자동 시작", "theme": "외관 테마", "themeDesc": "앱의 표시 테마를 선택합니다", "system": "시스템", "light": "라이트", "dark": "다크", "updateChannel": "업데이트 채널", "updateChannelDesc": "안정 릴리스 또는 베타 얼리 액세스 중 선택", "stable": "안정", "beta": "베타", "loading": "설정 로드 중…", "loadFailed": "설정 로드 실패" },
+    "about": { "title": "정보", "shellVersion": "Shell 버전", "viewOnGithub": "GitHub에서 프로젝트 보기", "fetchingVersions": "버전 정보 가져오는 중…" },
+    "updates": { "title": "업데이트 및 유지보수", "checkForUpdates": "업데이트 확인", "checkHint": "GitHub에서 OpenClaw Desktop의 새 버전이 있는지 확인합니다.", "checkNow": "지금 확인", "checking": "업데이트 확인 중…", "checkFailed": "업데이트를 확인할 수 없습니다", "newVersion": "새 버전 사용 가능!", "current": "현재", "latest": "최신", "published": "게시됨", "downloadInstaller": "설치 프로그램 다운로드", "viewRelease": "릴리스 보기", "upToDate": "최신 버전을 사용 중입니다 ({{version}}).", "checkAgain": "다시 확인", "bundleIntegrity": "번들 무결성", "verifying": "번들 검증 중…", "bundleOk": "번들이 완전하고 유효합니다", "bundleIssues": "번들에 문제가 있습니다", "nodeRuntime": "Node.js 런타임", "openclawPackage": "OpenClaw 패키지", "electronShell": "Electron 셸", "appVersion": "앱 버전", "missingFiles": "누락된 파일:", "reinstallHint": "앱을 재설치하면 누락된 파일이 해결됩니다.", "reVerify": "재검증", "healthCheck": "시스템 상태 확인", "healthCheckHint": "번들 무결성, 설정 유효성, 서비스 준비 상태를 포함한 종합 상태 확인을 실행합니다.", "runHealthCheck": "상태 확인 실행", "runningCheck": "상태 확인 실행 중…", "allPassed": "모든 확인 통과", "issuesDetected": "문제 감지됨", "bundleIntegrityCheck": "번들 무결성", "configExists": "설정 파일 존재", "configValid": "설정 유효", "errors": "오류:", "suggestions": "제안:", "reCheck": "재확인", "openLogDir": "로그 디렉토리 열기", "repairRollback": "복구 및 롤백", "reinstall": "재설치", "reinstallDesc": "번들 무결성 검사에 실패하면 GitHub Releases에서 최신 설치 프로그램을 다운로드하여 재설치하세요.", "resetConfig": "설정 초기화", "resetConfigDesc": "설정이 손상된 경우 설정 파일을 삭제하고 앱을 다시 시작하세요.", "rollback": "롤백", "rollbackDesc": "이전 버전으로 롤백하려면 GitHub Releases에서 이전 설치 프로그램을 다운로드하세요.", "viewAllReleases": "모든 릴리스 보기" },
+    "loading": { "appName": "OpenClaw Desktop", "timeout": "게이트웨이 시작 시간 초과", "retry": "재시도" },
+    "error": { "appName": "OpenClaw Desktop", "retry": "재시도", "openLogDir": "로그 디렉토리 열기" },
+    "nav": { "dashboard": "대시보드", "dashboardDesc": "게이트웨이 상태 및 버전", "llmApi": "LLM API", "llmApiDesc": "제공업체 및 인증 프로필", "skills": "스킬", "skillsDesc": "스킬 및 확장", "updates": "업데이트", "updatesDesc": "업데이트 확인", "settings": "설정", "settingsDesc": "외관 및 시작", "about": "정보", "aboutDesc": "버전 정보", "desktopManager": "데스크톱 매니저", "desktopManagerDesc": "데스크톱 전용 기능 및 설정", "backToControlUI": "Control UI" },
+    "status": { "starting": "시작 중…", "running": "실행 중", "stopped": "중지됨", "error": "오류", "loadingVersions": "버전 정보 로드 중…", "comingSoon": "곧 출시" }
+  }
+}

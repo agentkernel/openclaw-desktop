@@ -1,0 +1,5 @@
+export { getLogAggregator, LogAggregator, type StructuredLog } from './log-aggregator.js'
+export { redactConfig, redactPath } from './redact.js'
+export { exportDiagnostics, type DiagnosticsExportInput, type DiagnosticsExportResult } from './export.js'
+export { runPrestartCheck, type PrestartCheckResult } from './prestart-check.js'
+export { runDiagnostics, getDiagnosticsSummary } from './doctor-proxy.js'

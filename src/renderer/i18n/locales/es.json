@@ -1,0 +1,80 @@
+{
+  "wizard": {
+    "appName": "OpenClaw Desktop",
+    "setupWizard": "Asistente de configuración",
+    "steps": { "welcome": "Bienvenida", "model": "Modelo", "channel": "Canales", "gateway": "Puerta de enlace", "complete": "Completar" },
+    "nav": { "previous": "Anterior", "skip": "Omitir", "startSetup": "Iniciar configuración", "next": "Siguiente" },
+    "welcome": {
+      "title": "Bienvenido a OpenClaw Desktop",
+      "subtitle": "OpenClaw Desktop empaqueta el asistente de IA como aplicación nativa de Windows con instalación y configuración integradas. Este asistente te guiará en la configuración inicial.",
+      "startHint": "Haz clic en \"Iniciar configuración\" abajo para comenzar",
+      "features": {
+        "model": { "title": "Integración de modelos IA", "description": "Soporte para Anthropic, OpenAI, Google y otros proveedores principales con configuración de API key en un clic." },
+        "channel": { "title": "Soporte multicanal", "description": "Adaptadores Feishu, Telegram y otros integrados para conectar tus herramientas de comunicación en equipo." },
+        "gateway": { "title": "Puerta de enlace local", "description": "La puerta de enlace se ejecuta de forma segura en tu equipo; los datos no salen de tu ordenador." },
+        "ready": { "title": "Listo para usar", "description": "El asistente de configuración completa la configuración en minutos sin editar archivos manualmente." }
+      }
+    },
+    "model": {
+      "title": "Configuración del modelo", "subtitle": "Selecciona el proveedor del modelo IA y configura la clave API para las conversaciones de OpenClaw.",
+      "provider": "Proveedor del modelo", "selectProvider": "Seleccionar proveedor",
+      "moonshotEndpoint": "Punto de acceso Moonshot", "moonshotGlobal": "Global (api.moonshot.ai)", "moonshotChina": "China (api.moonshot.cn)",
+      "apiKey": "Clave API", "apiKeyStored": "La clave API se almacena solo localmente y nunca se sube.",
+      "oauthHint": "Este proveedor usa OAuth. Autentícate vía el CLI de OpenClaw en esta máquina.",
+      "noKeyHint": "Este proveedor usa credenciales locales o configuración de entorno. No se requiere clave API.",
+      "defaultModel": "Modelo predeterminado", "selectModel": "Seleccionar modelo", "customModelId": "ID de modelo personalizado…",
+      "backToPresets": "Volver a preajustes", "enterModelId": "Ingresa el ID del modelo",
+      "providerId": "ID del proveedor", "apiBaseUrl": "URL base de la API", "compatibility": "Compatibilidad",
+      "openaiCompatible": "Compatible con OpenAI", "anthropicCompatible": "Compatible con Anthropic",
+      "testConnection": "Probar conexión", "testing": "Probando…",
+      "connectionSuccess": "Conexión exitosa", "connectionFailed": "Conexión fallida. Verifica la clave API y el ID del modelo.",
+      "networkError": "No se puede conectar al servicio de prueba. Verifica la conexión de red.",
+      "testHint": "Haz clic en \"Probar conexión\" para verificar la clave API y la configuración del modelo.",
+      "noTestHint": "Este proveedor no admite pruebas automáticas en el asistente. Puedes continuar y validar después vía CLI.",
+      "showApiKey": "Mostrar clave API", "hideApiKey": "Ocultar clave API"
+    },
+    "channel": {
+      "title": "Configuración de canales", "subtitle": "Configura canales de mensajería para conectar Feishu, Telegram, WhatsApp o Discord.",
+      "feishu": { "title": "Canal Feishu", "description": "Crea una aplicación en la plataforma abierta de Feishu y obtén los siguientes parámetros.", "openPlatform": "Abrir plataforma Feishu", "appId": "App ID", "appSecret": "App Secret", "verificationToken": "Token de verificación", "encryptKey": "Clave de cifrado", "optional": "opcional", "requiredDone": "Campos requeridos de Feishu completados.", "requiredMissing": "App ID y App Secret son requeridos cuando se selecciona Feishu." },
+      "telegram": { "title": "Canal Telegram", "description": "Crea un bot vía @BotFather y pega el token abajo.", "botToken": "Token del bot", "configDone": "Token del bot de Telegram configurado.", "configMissing": "El token del bot de BotFather es requerido cuando se selecciona Telegram." },
+      "discord": { "title": "Canal Discord", "description": "Crea una aplicación en el portal de desarrolladores de Discord y copia el token del bot.", "botToken": "Token del bot", "configDone": "Token del bot de Discord configurado.", "configMissing": "El token del bot del portal de desarrolladores de Discord es requerido cuando se selecciona Discord." },
+      "slack": { "title": "Canal Slack", "description": "Configura tu aplicación Slack. El modo Socket usa Bot Token + App-Level Token; el modo HTTP usa Bot Token + Signing Secret.", "connectionMode": "Modo de conexión", "socketMode": "Modo Socket", "httpMode": "HTTP (Events API)", "botToken": "Token del bot", "signingSecret": "Secreto de firma", "appLevelToken": "Token de App-Level", "configDone": "Campos requeridos de Slack completados.", "configMissing": "El token del bot es requerido; el secreto de firma es requerido para el modo HTTP." },
+      "whatsapp": { "title": "WhatsApp (Baileys)", "description": "WhatsApp usa autenticación por código QR. Configura este canal después de la instalación vía la interfaz de control." },
+      "skipChannels": "Omitir, usar solo WebChat", "skipHint": "Puedes agregar la configuración de canales después en la configuración."
+    },
+    "gateway": {
+      "title": "Configuración de la puerta de enlace", "subtitle": "Configura el puerto de red, dirección de enlace y autenticación para el servicio de puerta de enlace.",
+      "port": "Puerto", "checkPort": "Verificar puerto", "checking": "Verificando…",
+      "portAvailable": "El puerto {{port}} está disponible.", "portOccupied": "El puerto {{port}} está en uso.",
+      "portRange": "El puerto debe estar en el rango 1024–65535.", "portCheckFailed": "Verificación del puerto fallida. Intenta de nuevo.",
+      "useSuggested": "Usar puerto sugerido {{port}}",
+      "bindAddress": "Dirección de enlace", "loopback": "Bucle local (solo localhost)", "loopbackDesc": "Solo localhost (127.0.0.1) puede acceder a la puerta de enlace. Opción más segura.", "recommended": "Recomendado",
+      "lan": "LAN", "lanDesc": "Otros dispositivos en la LAN pueden acceder. Usa un token de autenticación para proteger la API.",
+      "auto": "Auto", "autoDesc": "La puerta de enlace elige la dirección de enlace automáticamente. Puede exponerse a la red pública.",
+      "authToken": "Token de autenticación", "regenerate": "Regenerar", "tokenHint": "Usado para la autenticación de la API de la puerta de enlace. Se recomienda mantener el valor generado automáticamente."
+    },
+    "complete": {
+      "title": "Confirmar configuración", "subtitle": "Revisa la configuración a continuación y haz clic en \"Confirmar e iniciar\" para completar la configuración.",
+      "modelConfig": "Configuración del modelo", "provider": "Proveedor", "defaultModel": "Modelo predeterminado", "apiKey": "Clave API",
+      "channelConfig": "Configuración de canales", "channel": "Canal", "webChatOnly": "Solo WebChat (canales omitidos)", "configureViaUI": "Configurar vía interfaz de control después de la instalación",
+      "gatewaySettings": "Configuración de la puerta de enlace", "port": "Puerto", "bindAddress": "Dirección de enlace", "authToken": "Token de autenticación",
+      "confirmStart": "Confirmar e iniciar", "retry": "Reintentar", "edit": "Editar",
+      "writing": "Escribiendo configuración…", "starting": "Iniciando puerta de enlace (puede tardar 1-5 minutos). Por favor espera…",
+      "success": "La puerta de enlace está lista, redirigiendo…", "startHint": "El inicio de la puerta de enlace puede tardar 1-5 minutos. No cierres esta ventana.",
+      "errorConfig": "Error al escribir la configuración. Verifica el espacio en disco y los permisos, luego reintenta.",
+      "errorAuth": "Error al escribir las credenciales. Verifica los permisos del disco, luego reintenta.",
+      "errorGateway": "Error al iniciar la puerta de enlace. Verifica si el puerto está en uso o revisa los registros.",
+      "errorGeneral": "Operación fallida"
+    }
+  },
+  "shell": {
+    "dashboard": { "title": "Panel", "subtitle": "Estado de la puerta de enlace, info de versiones y acceso rápido a configuración y registros", "gateway": "Puerta de enlace", "versions": "Versiones", "quickActions": "Acciones rápidas", "logs": "Registros", "logsDesc": "Abrir directorio de registros", "diagnostics": "Diagnósticos", "diagnosticsDesc": "Exportar informe de diagnóstico", "settings": "Configuración", "settingsDesc": "Apariencia, inicio, tema", "updates": "Actualizaciones", "updatesDesc": "Buscar nuevas versiones", "skills": "Habilidades", "skillsDesc": "Gestionar habilidades y extensiones", "llmApi": "LLM API", "llmApiDesc": "Proveedores y perfiles de autenticación", "recentError": "Error reciente", "errorHint": "El servicio de puerta de enlace se cerró inesperadamente. Revisa los registros o reintenta." },
+    "settings": { "title": "Configuración", "closeToTray": "Minimizar a bandeja al cerrar", "closeToTrayDesc": "La aplicación sigue ejecutándose en la bandeja del sistema tras cerrar la ventana", "autoStart": "Iniciar al conectarse", "autoStartDesc": "Iniciar OpenClaw al iniciar sesión en Windows", "theme": "Tema de apariencia", "themeDesc": "Elige el tema de visualización de la aplicación", "system": "Sistema", "light": "Claro", "dark": "Oscuro", "updateChannel": "Canal de actualización", "updateChannelDesc": "Elige entre versiones estables o beta para acceso anticipado", "stable": "Estable", "beta": "Beta", "loading": "Cargando configuración…", "loadFailed": "Error al cargar la configuración" },
+    "about": { "title": "Acerca de", "shellVersion": "Versión del Shell", "viewOnGithub": "Ver proyecto en GitHub", "fetchingVersions": "Obteniendo info de versión…" },
+    "updates": { "title": "Actualizaciones y mantenimiento", "checkForUpdates": "Buscar actualizaciones", "checkHint": "Verifica si hay una versión más nueva de OpenClaw Desktop en GitHub.", "checkNow": "Verificar ahora", "checking": "Buscando actualizaciones…", "checkFailed": "No se pudieron buscar actualizaciones", "newVersion": "¡Nueva versión disponible!", "current": "Actual", "latest": "Última", "published": "Publicada", "downloadInstaller": "Descargar instalador", "viewRelease": "Ver versión", "upToDate": "Estás usando la última versión ({{version}}).", "checkAgain": "Verificar de nuevo", "bundleIntegrity": "Integridad del bundle", "verifying": "Verificando bundle…", "bundleOk": "El bundle está completo y es válido", "bundleIssues": "El bundle tiene problemas", "nodeRuntime": "Runtime Node.js", "openclawPackage": "Paquete OpenClaw", "electronShell": "Shell Electron", "appVersion": "Versión de la app", "missingFiles": "Archivos faltantes:", "reinstallHint": "Reinstalar la aplicación debería resolver los archivos faltantes.", "reVerify": "Re-verificar", "healthCheck": "Verificación de salud del sistema", "healthCheckHint": "Ejecutar una verificación completa de salud del sistema.", "runHealthCheck": "Ejecutar verificación", "runningCheck": "Ejecutando verificación…", "allPassed": "Todas las verificaciones pasaron", "issuesDetected": "Problemas detectados", "bundleIntegrityCheck": "Integridad del bundle", "configExists": "El archivo de configuración existe", "configValid": "La configuración es válida", "errors": "Errores:", "suggestions": "Sugerencias:", "reCheck": "Re-verificar", "openLogDir": "Abrir directorio de registros", "repairRollback": "Reparar y restaurar", "reinstall": "Reinstalar", "reinstallDesc": "Si la verificación de integridad falla, descarga el último instalador de GitHub Releases y reinstala.", "resetConfig": "Restablecer configuración", "resetConfigDesc": "Si la configuración está corrupta, elimina el archivo de configuración y reinicia la aplicación.", "rollback": "Restaurar", "rollbackDesc": "Para restaurar una versión anterior, descarga un instalador antiguo de GitHub Releases.", "viewAllReleases": "Ver todas las versiones" },
+    "loading": { "appName": "OpenClaw Desktop", "timeout": "Tiempo de espera del inicio de la puerta de enlace", "retry": "Reintentar" },
+    "error": { "appName": "OpenClaw Desktop", "retry": "Reintentar", "openLogDir": "Abrir directorio de registros" },
+    "nav": { "dashboard": "Panel", "dashboardDesc": "Estado de la puerta de enlace y versiones", "llmApi": "LLM API", "llmApiDesc": "Proveedores y perfiles de auth", "skills": "Habilidades", "skillsDesc": "Habilidades y extensiones", "updates": "Actualizaciones", "updatesDesc": "Buscar actualizaciones", "settings": "Configuración", "settingsDesc": "Apariencia e inicio", "about": "Acerca de", "aboutDesc": "Información de versión", "desktopManager": "Gestor de escritorio", "desktopManagerDesc": "Funciones y configuración específicas del escritorio", "backToControlUI": "Control UI" },
+    "status": { "starting": "Iniciando…", "running": "En ejecución", "stopped": "Detenido", "error": "Error", "loadingVersions": "Cargando info de versiones…", "comingSoon": "Próximamente" }
+  }
+}

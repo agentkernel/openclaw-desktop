@@ -1,0 +1,80 @@
+{
+  "wizard": {
+    "appName": "OpenClaw Desktop",
+    "setupWizard": "セットアップウィザード",
+    "steps": { "welcome": "ようこそ", "model": "モデル", "channel": "チャネル", "gateway": "ゲートウェイ", "complete": "完了" },
+    "nav": { "previous": "戻る", "skip": "スキップ", "startSetup": "セットアップを開始", "next": "次へ" },
+    "welcome": {
+      "title": "OpenClaw Desktop へようこそ",
+      "subtitle": "OpenClaw Desktop は AI アシスタントをネイティブ Windows アプリとしてパッケージし、インストールと設定を統合しています。このウィザードが初期設定を案内します。",
+      "startHint": "以下の「セットアップを開始」をクリックして開始",
+      "features": {
+        "model": { "title": "AI モデル連携", "description": "Anthropic、OpenAI、Google などの主要プロバイダーに対応。ワンクリックで API キーを設定。" },
+        "channel": { "title": "マルチチャネル対応", "description": "Feishu、Telegram などのチャネルアダプターを内蔵し、チームコラボツールと連携。" },
+        "gateway": { "title": "ローカルゲートウェイ", "description": "ゲートウェイはお使いの PC で安全に動作し、データは外部に送信されません。" },
+        "ready": { "title": "すぐに使える", "description": "ウィザードで数分で設定完了。手動で設定ファイルを編集する必要はありません。" }
+      }
+    },
+    "model": {
+      "title": "モデル設定", "subtitle": "AI モデルプロバイダーを選択し、API キーを設定して OpenClaw の対話を有効にします。",
+      "provider": "モデルプロバイダー", "selectProvider": "プロバイダーを選択",
+      "moonshotEndpoint": "Moonshot エンドポイント", "moonshotGlobal": "グローバル (api.moonshot.ai)", "moonshotChina": "中国 (api.moonshot.cn)",
+      "apiKey": "API キー", "apiKeyStored": "API キーはローカルにのみ保存され、アップロードされません。",
+      "oauthHint": "このプロバイダーは OAuth を使用します。このマシンで OpenClaw CLI を使って認証してください。",
+      "noKeyHint": "このプロバイダーはローカル資格情報または環境設定を使用します。API キーは不要です。",
+      "defaultModel": "デフォルトモデル", "selectModel": "モデルを選択", "customModelId": "カスタムモデル ID…",
+      "backToPresets": "プリセットに戻る", "enterModelId": "モデル ID を入力",
+      "providerId": "プロバイダー ID", "apiBaseUrl": "API ベース URL", "compatibility": "互換性",
+      "openaiCompatible": "OpenAI 互換", "anthropicCompatible": "Anthropic 互換",
+      "testConnection": "接続テスト", "testing": "テスト中…",
+      "connectionSuccess": "接続成功", "connectionFailed": "接続失敗。API キーとモデル ID を確認してください。",
+      "networkError": "テストサービスに接続できません。ネットワーク接続を確認してください。",
+      "testHint": "「接続テスト」をクリックして API キーとモデル設定を検証します。",
+      "noTestHint": "このプロバイダーはウィザード内の自動テストに対応していません。設定を続行し、後で CLI で検証できます。",
+      "showApiKey": "API キーを表示", "hideApiKey": "API キーを非表示"
+    },
+    "channel": {
+      "title": "チャネル設定", "subtitle": "Feishu、Telegram、WhatsApp、Discord に接続するメッセージチャネルを設定します。",
+      "feishu": { "title": "Feishu チャネル", "description": "Feishu 開発プラットフォームでアプリを作成し、以下のパラメータを取得してください。", "openPlatform": "Feishu プラットフォームを開く", "appId": "App ID", "appSecret": "App Secret", "verificationToken": "Verification Token", "encryptKey": "Encrypt Key", "optional": "任意", "requiredDone": "Feishu の必須項目が入力されました。", "requiredMissing": "Feishu 選択時は App ID と App Secret が必要です。" },
+      "telegram": { "title": "Telegram チャネル", "description": "@BotFather でボットを作成し、トークンを貼り付けてください。", "botToken": "Bot Token", "configDone": "Telegram Bot Token が設定されました。", "configMissing": "Telegram 選択時は BotFather の Bot Token が必要です。" },
+      "discord": { "title": "Discord チャネル", "description": "Discord Developer Portal でアプリを作成し、Bot Token をコピーしてください。", "botToken": "Bot Token", "configDone": "Discord Bot Token が設定されました。", "configMissing": "Discord 選択時は Developer Portal の Bot Token が必要です。" },
+      "slack": { "title": "Slack チャネル", "description": "Slack アプリを設定します。Socket モードは Bot Token + App-Level Token、HTTP モードは Bot Token + Signing Secret を使用します。", "connectionMode": "接続モード", "socketMode": "Socket モード", "httpMode": "HTTP (Events API)", "botToken": "Bot Token", "signingSecret": "Signing Secret", "appLevelToken": "App-Level Token", "configDone": "Slack の必須項目が入力されました。", "configMissing": "Bot Token は必須です。HTTP モードでは Signing Secret も必要です。" },
+      "whatsapp": { "title": "WhatsApp (Baileys)", "description": "WhatsApp は QR コード認証を使用します。セットアップ後に Control UI で設定してください。" },
+      "skipChannels": "スキップして WebChat のみ使用", "skipHint": "チャネル設定は後から設定で追加できます。"
+    },
+    "gateway": {
+      "title": "ゲートウェイ設定", "subtitle": "ゲートウェイサービスのネットワークポート、バインドアドレス、認証を設定します。",
+      "port": "ポート", "checkPort": "ポート確認", "checking": "確認中…",
+      "portAvailable": "ポート {{port}} は使用可能です。", "portOccupied": "ポート {{port}} は使用中です。",
+      "portRange": "ポートは 1024–65535 の範囲でなければなりません。", "portCheckFailed": "ポート確認に失敗しました。再試行してください。",
+      "useSuggested": "推奨ポート {{port}} を使用",
+      "bindAddress": "バインドアドレス", "loopback": "ループバック（localhost のみ）", "loopbackDesc": "localhost (127.0.0.1) のみゲートウェイにアクセスを許可します。最も安全です。", "recommended": "推奨",
+      "lan": "LAN", "lanDesc": "LAN 上の他のデバイスがアクセスできます。認証トークンで API を保護してください。",
+      "auto": "自動", "autoDesc": "ゲートウェイが自動的にバインドアドレスを選択します。パブリックネットワークに公開される可能性があります。",
+      "authToken": "認証トークン", "regenerate": "再生成", "tokenHint": "ゲートウェイ API 認証に使用します。自動生成された値を保持することを推奨します。"
+    },
+    "complete": {
+      "title": "設定の確認", "subtitle": "以下の設定を確認し、「確認して開始」をクリックしてセットアップを完了します。",
+      "modelConfig": "モデル設定", "provider": "プロバイダー", "defaultModel": "デフォルトモデル", "apiKey": "API キー",
+      "channelConfig": "チャネル設定", "channel": "チャネル", "webChatOnly": "WebChat のみ（チャネルスキップ）", "configureViaUI": "セットアップ後に Control UI で設定",
+      "gatewaySettings": "ゲートウェイ設定", "port": "ポート", "bindAddress": "バインドアドレス", "authToken": "認証トークン",
+      "confirmStart": "確認して開始", "retry": "再試行", "edit": "編集",
+      "writing": "設定を書き込み中…", "starting": "ゲートウェイを起動中（1〜5分かかる場合があります）。お待ちください…",
+      "success": "ゲートウェイの準備完了、リダイレクト中…", "startHint": "ゲートウェイの起動には1〜5分かかる場合があります。このウィンドウを閉じないでください。",
+      "errorConfig": "設定の書き込みに失敗しました。ディスク容量と権限を確認してから再試行してください。",
+      "errorAuth": "資格情報の書き込みに失敗しました。ディスク権限を確認してから再試行してください。",
+      "errorGateway": "ゲートウェイの起動に失敗しました。ポートが使用中かどうか確認するか、ログを確認してください。",
+      "errorGeneral": "操作に失敗しました"
+    }
+  },
+  "shell": {
+    "dashboard": { "title": "ダッシュボード", "subtitle": "ゲートウェイの状態、バージョン情報、設定やログへのクイックアクセス", "gateway": "ゲートウェイ", "versions": "バージョン", "quickActions": "クイックアクション", "logs": "ログ", "logsDesc": "ログディレクトリを開く", "diagnostics": "診断", "diagnosticsDesc": "診断レポートをエクスポート", "settings": "設定", "settingsDesc": "外観、起動、テーマ", "updates": "更新", "updatesDesc": "新しいバージョンを確認", "skills": "スキル", "skillsDesc": "スキルと拡張機能を管理", "llmApi": "LLM API", "llmApiDesc": "プロバイダーと認証プロファイル", "recentError": "最近のエラー", "errorHint": "ゲートウェイサービスが予期せず終了しました。ログを確認するか再試行してください。" },
+    "settings": { "title": "設定", "closeToTray": "閉じるときにトレイに最小化", "closeToTrayDesc": "ウィンドウを閉じた後もシステムトレイでアプリが動作を続けます", "autoStart": "ログイン時に起動", "autoStartDesc": "Windows サインイン時に OpenClaw を起動", "theme": "外観テーマ", "themeDesc": "アプリの表示テーマを選択", "system": "システム", "light": "ライト", "dark": "ダーク", "updateChannel": "更新チャネル", "updateChannelDesc": "安定版またはベータ版を選択", "stable": "安定版", "beta": "ベータ", "loading": "設定を読み込み中…", "loadFailed": "設定の読み込みに失敗しました" },
+    "about": { "title": "バージョン情報", "shellVersion": "Shell バージョン", "viewOnGithub": "GitHub でプロジェクトを表示", "fetchingVersions": "バージョン情報を取得中…" },
+    "updates": { "title": "更新とメンテナンス", "checkForUpdates": "更新を確認", "checkHint": "GitHub で OpenClaw Desktop の新しいバージョンが利用可能か確認します。", "checkNow": "今すぐ確認", "checking": "更新を確認中…", "checkFailed": "更新を確認できません", "newVersion": "新しいバージョンが利用可能です！", "current": "現在", "latest": "最新", "published": "公開日", "downloadInstaller": "インストーラーをダウンロード", "viewRelease": "リリースを表示", "upToDate": "最新バージョンを使用しています ({{version}})。", "checkAgain": "再確認", "bundleIntegrity": "バンドル整合性", "verifying": "バンドルを検証中…", "bundleOk": "バンドルは完全で有効です", "bundleIssues": "バンドルに問題があります", "nodeRuntime": "Node.js ランタイム", "openclawPackage": "OpenClaw パッケージ", "electronShell": "Electron シェル", "appVersion": "アプリバージョン", "missingFiles": "不足ファイル：", "reinstallHint": "アプリを再インストールすると不足ファイルが解決されます。", "reVerify": "再検証", "healthCheck": "システムヘルスチェック", "healthCheckHint": "バンドル整合性、設定の有効性、サービスの準備状態を含む包括的なヘルスチェックを実行します。", "runHealthCheck": "ヘルスチェックを実行", "runningCheck": "ヘルスチェック実行中…", "allPassed": "すべてのチェックに合格", "issuesDetected": "問題が検出されました", "bundleIntegrityCheck": "バンドル整合性", "configExists": "設定ファイルが存在", "configValid": "設定が有効", "errors": "エラー：", "suggestions": "提案：", "reCheck": "再チェック", "openLogDir": "ログディレクトリを開く", "repairRollback": "修復とロールバック", "reinstall": "再インストール", "reinstallDesc": "バンドル整合性チェックに失敗した場合、GitHub Releases から最新のインストーラーをダウンロードして再インストールしてください。", "resetConfig": "設定をリセット", "resetConfigDesc": "設定が破損している場合、設定ファイルを削除してアプリを再起動してください。", "rollback": "ロールバック", "rollbackDesc": "以前のバージョンにロールバックするには、GitHub Releases から古いインストーラーをダウンロードしてください。", "viewAllReleases": "すべてのリリースを表示" },
+    "loading": { "appName": "OpenClaw Desktop", "timeout": "ゲートウェイ起動タイムアウト", "retry": "再試行" },
+    "error": { "appName": "OpenClaw Desktop", "retry": "再試行", "openLogDir": "ログディレクトリを開く" },
+    "nav": { "dashboard": "ダッシュボード", "dashboardDesc": "ゲートウェイ状態とバージョン", "llmApi": "LLM API", "llmApiDesc": "プロバイダーと認証プロファイル", "skills": "スキル", "skillsDesc": "スキルと拡張機能", "updates": "更新", "updatesDesc": "更新を確認", "settings": "設定", "settingsDesc": "外観と起動", "about": "バージョン情報", "aboutDesc": "バージョン情報", "desktopManager": "デスクトップマネージャー", "desktopManagerDesc": "デスクトップ版専用の機能と設定", "backToControlUI": "Control UI" },
+    "status": { "starting": "起動中…", "running": "実行中", "stopped": "停止", "error": "エラー", "loadingVersions": "バージョン情報を読み込み中…", "comingSoon": "近日公開" }
+  }
+}

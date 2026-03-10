@@ -1,0 +1,59 @@
+appId: com.openclaw.desktop
+productName: OpenClaw Desktop
+copyright: Copyright © 2026 OpenClaw Contributors
+
+directories:
+  output: dist
+  buildResources: resources
+
+electronDist: node_modules/electron/dist
+
+asar: true
+compression: normal
+
+extraResources:
+  - from: resources/node
+    to: node
+    filter:
+      - "**/*"
+  - from: resources/openclaw
+    to: openclaw
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.ico
+  artifactName: "OpenClaw-Setup-${version}.${ext}"
+  # 在 CI 中设置 CSC_LINK + CSC_KEY_PASSWORD 时进行代码签名
+  signAndEditExecutable: true
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+  installerSidebar: resources/installer/installer-sidebar.bmp
+  license: resources/installer/license.txt
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: OpenClaw Desktop
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+
+files:
+  - "out/**/*"
+  - "package.json"
+  - "!node_modules/**/*"
+  - "!src/**/*"
+  - "!scripts/**/*"
+  - "!build/**/*"
+  - "!docs/**/*"
+  - "!.cobrain/**/*"
+  - "!.github/**/*"
+  - "!resources/node/**/*"
+  - "!resources/openclaw/**/*"

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src http://127.0.0.1:* http://localhost:*" />
+    <title>OpenClaw Desktop</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      setTimeout(function () {
+        var r = document.getElementById('root');
+        if (r && !r.hasChildNodes()) {
+          r.innerHTML = '<div style="padding:2rem;font-family:system-ui;color:#666;"><p>UI load timeout.</p><p>Check: 1) Set OPENCLAW_DEVTOOLS=1 and restart to open DevTools; 2) Or run exe from command line to see main process output.</p></div>';
+        }
+      }, 5000);
+    </script>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

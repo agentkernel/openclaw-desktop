@@ -1,0 +1,271 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.2.3)'
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref_name || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify (lint, type-check, build)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ELECTRON_CACHE: ~/.cache/electron
+      ELECTRON_BUILDER_CACHE: ~/.cache/electron-builder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Build
+        run: pnpm run build
+
+  package_win:
+    name: Package Windows Installer
+    needs:
+      - verify
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.upload-installer.outputs.artifact-id }}
+    # SignPath 模式：vars.USE_SIGNPATH=true 时构建未签名包；否则用 CSC_LINK 签名
+    env:
+      CSC_LINK: ${{ vars.USE_SIGNPATH == 'true' && '' || secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ vars.USE_SIGNPATH == 'true' && '' || secrets.CSC_KEY_PASSWORD }}
+      ELECTRON_CACHE: ~\AppData\Local\electron\Cache
+      ELECTRON_BUILDER_CACHE: ~\AppData\Local\electron-builder\Cache
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: pnpm
+
+      - name: Cache Electron
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ELECTRON_CACHE }}
+            ${{ env.ELECTRON_BUILDER_CACHE }}
+          key: ${{ runner.os }}-electron-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Electron app
+        run: pnpm run build
+
+      - name: Prepare apple-touch-icon for generate-resources
+        run: |
+          if (Test-Path resources/apple-touch-icon.png) {
+            Copy-Item resources/apple-touch-icon.png apple-touch-icon.png -Force
+          }
+
+      - name: Download Node.js and OpenClaw, prepare bundle
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          npm_config_fetch_retries: "5"
+          npm_config_fetch_retry_mintimeout: "20000"
+        run: |
+          pnpm run download-node
+          pnpm run download-openclaw
+          pnpm run prepare-bundle
+
+      - name: Package Windows installer
+        run: pnpm run package:win
+
+      - name: Copy bundle manifest to dist
+        run: Copy-Item resources/bundle-manifest.json dist/ -Force
+
+      - name: Upload installer artifact
+        id: upload-installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: openclaw-desktop-build
+          path: |
+            dist/OpenClaw-Setup-*.exe
+            dist/bundle-manifest.json
+
+  sign_path:
+    name: Sign with SignPath Foundation
+    needs:
+      - package_win
+    # 设置仓库变量 USE_SIGNPATH=true 时启用；否则使用 CSC_LINK 开发者签名
+    if: vars.USE_SIGNPATH == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Submit to SignPath for signing
+        id: signpath
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: openclaw-desktop
+          github-artifact-id: ${{ needs.package_win.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: dist-signed-raw
+
+      - name: Extract signed exe from zip
+        run: |
+          cd dist-signed-raw
+          shopt -s nullglob
+          for z in *.zip; do
+            unzip -o "$z"
+            rm -f "$z"
+          done
+
+      - name: Download build artifact for bundle manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: openclaw-desktop-build
+          path: manifest-temp
+
+      - name: Copy bundle manifest into signed artifact
+        run: |
+          if [ -f manifest-temp/dist/bundle-manifest.json ]; then
+            cp manifest-temp/dist/bundle-manifest.json dist-signed-raw/
+          fi
+
+      - name: Upload signed installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: openclaw-desktop-setup
+          path: dist-signed-raw/
+
+  publish_release:
+    name: Publish GitHub Release
+    needs:
+      - package_win
+      - sign_path
+    if: ${{ always() && needs.package_win.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: false
+
+      - name: Download signed installer
+        if: needs.sign_path.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: openclaw-desktop-setup
+          path: dist
+
+      - name: Download build artifact (unsigned)
+        if: needs.sign_path.result == 'skipped'
+        uses: actions/download-artifact@v4
+        with:
+          name: openclaw-desktop-build
+          path: dist
+
+      - name: Generate SHA-256 checksums
+        run: |
+          cd dist
+          for file in OpenClaw-Setup-*.exe; do
+            [ -f "$file" ] || continue
+            sha256sum "$file" > "$file.sha256"
+          done
+
+      - name: Generate latest.yml for electron-updater
+        id: gen-yml
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          if [[ "$VERSION" == *"-beta"* ]] || [[ "$VERSION" == *"-alpha"* ]] || [[ "$VERSION" == *"-rc"* ]]; then
+            CHANNEL=beta
+          else
+            CHANNEL=stable
+          fi
+          EXE=$(find dist -name "OpenClaw-Setup-*.exe" -type f | head -1)
+          if [ -z "$EXE" ]; then
+            echo "error: no OpenClaw-Setup-*.exe found in dist"
+            exit 1
+          fi
+          MANIFEST_ARG=""
+          if [ -f dist/bundle-manifest.json ]; then
+            MANIFEST_ARG="--manifest dist/bundle-manifest.json"
+          fi
+          node scripts/generate-latest-yml.mjs --exe "$EXE" --version "$VERSION" --channel "$CHANNEL" --output dist $MANIFEST_ARG
+          if [ "$CHANNEL" = "beta" ]; then
+            echo "yml_file=dist/latest-beta.yml" >> $GITHUB_OUTPUT
+          else
+            echo "yml_file=dist/latest.yml" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: ${{ inputs.tag || github.ref_name }}
+          files: |
+            dist/OpenClaw-Setup-*.exe
+            dist/OpenClaw-Setup-*.exe.sha256
+            ${{ steps.gen-yml.outputs.yml_file }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

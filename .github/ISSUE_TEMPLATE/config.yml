@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: OpenClaw upstream project
+    url: https://github.com/openclaw/openclaw
+    about: Report runtime issues that belong to upstream OpenClaw here when appropriate.

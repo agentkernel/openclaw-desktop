@@ -1,0 +1,91 @@
+{
+  "wizard": {
+    "appName": "OpenClaw Desktop",
+    "setupWizard": "設定精靈",
+    "steps": {
+      "welcome": "歡迎",
+      "model": "模型",
+      "channel": "通道",
+      "gateway": "閘道",
+      "complete": "完成"
+    },
+    "nav": {
+      "previous": "上一步",
+      "skip": "略過",
+      "startSetup": "開始設定",
+      "next": "下一步"
+    },
+    "welcome": {
+      "title": "歡迎使用 OpenClaw Desktop",
+      "subtitle": "OpenClaw Desktop 將 AI 助手打包為原生 Windows 桌面應用程式，整合安裝與設定流程。本精靈將引導您完成初始設定。",
+      "startHint": "點擊下方「開始設定」以開始",
+      "features": {
+        "model": { "title": "AI 模型整合", "description": "支援 Anthropic、OpenAI、Google 等主流供應商，一鍵設定 API Key。" },
+        "channel": { "title": "多通道支援", "description": "內建飛書、Telegram 等通道適配器，連結您的團隊協作工具。" },
+        "gateway": { "title": "本機閘道", "description": "閘道安全運行於本機，資料不會離開您的電腦。" },
+        "ready": { "title": "開箱即用", "description": "精靈式設定幾分鐘內完成，無須手動編輯設定檔。" }
+      }
+    },
+    "model": {
+      "title": "模型設定", "subtitle": "選擇 AI 模型供應商並設定 API Key，為 OpenClaw 對話提供動力。",
+      "provider": "模型供應商", "selectProvider": "選擇供應商",
+      "moonshotEndpoint": "Moonshot 接入點", "moonshotGlobal": "全球 (api.moonshot.ai)", "moonshotChina": "中國區 (api.moonshot.cn)",
+      "apiKey": "API Key", "apiKeyStored": "API Key 僅儲存在本機，不會上傳。",
+      "oauthHint": "此供應商使用 OAuth 認證。請先在此機器上透過 OpenClaw CLI 完成認證。",
+      "noKeyHint": "此供應商使用本機憑證或環境設定，無需 API Key。",
+      "defaultModel": "預設模型", "selectModel": "選擇模型", "customModelId": "自訂模型 ID…",
+      "backToPresets": "返回預設列表", "enterModelId": "輸入模型 ID",
+      "providerId": "供應商 ID", "apiBaseUrl": "API 基礎 URL", "compatibility": "相容協定",
+      "openaiCompatible": "OpenAI 相容", "anthropicCompatible": "Anthropic 相容",
+      "testConnection": "測試連線", "testing": "測試中…",
+      "connectionSuccess": "連線成功", "connectionFailed": "連線失敗，請檢查 API Key 和模型 ID。",
+      "networkError": "無法連接測試服務，請檢查網路連線。",
+      "testHint": "點擊「測試連線」驗證 API Key 和模型設定。",
+      "noTestHint": "此供應商不支援精靈內自動測試，可繼續設定並稍後透過 CLI 驗證。",
+      "showApiKey": "顯示 API Key", "hideApiKey": "隱藏 API Key"
+    },
+    "channel": {
+      "title": "通道設定", "subtitle": "設定訊息通道以連接飛書、Telegram、WhatsApp 或 Discord。",
+      "feishu": { "title": "飛書通道", "description": "在飛書開放平台建立應用並取得以下參數。", "openPlatform": "開啟飛書開放平台", "appId": "App ID", "appSecret": "App Secret", "verificationToken": "Verification Token", "encryptKey": "Encrypt Key", "optional": "選填", "requiredDone": "飛書必填欄位已完成。", "requiredMissing": "選擇飛書時需填寫 App ID 和 App Secret。" },
+      "telegram": { "title": "Telegram 通道", "description": "透過 @BotFather 建立機器人並貼上令牌。", "botToken": "Bot Token", "configDone": "Telegram Bot Token 已設定。", "configMissing": "選擇 Telegram 時需填寫 BotFather 提供的 Bot Token。" },
+      "discord": { "title": "Discord 通道", "description": "在 Discord Developer Portal 建立應用並複製 Bot Token。", "botToken": "Bot Token", "configDone": "Discord Bot Token 已設定。", "configMissing": "選擇 Discord 時需填寫 Developer Portal 提供的 Bot Token。" },
+      "slack": { "title": "Slack 通道", "description": "設定 Slack 應用。Socket 模式使用 Bot Token + App-Level Token；HTTP 模式使用 Bot Token + Signing Secret。", "connectionMode": "連線模式", "socketMode": "Socket 模式", "httpMode": "HTTP (Events API)", "botToken": "Bot Token", "signingSecret": "Signing Secret", "appLevelToken": "App-Level Token", "configDone": "Slack 必填欄位已完成。", "configMissing": "Bot Token 為必填；HTTP 模式還需要 Signing Secret。" },
+      "whatsapp": { "title": "WhatsApp (Baileys)", "description": "WhatsApp 使用 QR Code 認證，請在設定完成後透過 Control UI 進行設定。" },
+      "skipChannels": "略過，僅使用 WebChat", "skipHint": "您可以在設定中隨時新增通道設定。"
+    },
+    "gateway": {
+      "title": "閘道設定", "subtitle": "設定閘道服務的網路埠、綁定位址和認證方式。",
+      "port": "埠號", "checkPort": "檢測埠號", "checking": "檢測中…",
+      "portAvailable": "埠號 {{port}} 可用。", "portOccupied": "埠號 {{port}} 已被佔用。",
+      "portRange": "埠號必須在 1024–65535 範圍內。", "portCheckFailed": "埠號檢測失敗，請重試。",
+      "useSuggested": "使用建議埠號 {{port}}",
+      "bindAddress": "綁定位址", "loopback": "本機回環（僅 localhost）", "loopbackDesc": "僅允許 localhost (127.0.0.1) 存取閘道，最安全的選項。", "recommended": "推薦",
+      "lan": "區域網路", "lanDesc": "區域網路內其他裝置可存取。請使用認證令牌保護 API。",
+      "auto": "自動", "autoDesc": "閘道自動選擇綁定位址。可能暴露到公網，請確保防火牆已設定。",
+      "authToken": "認證令牌", "regenerate": "重新產生", "tokenHint": "用於閘道 API 認證。建議保留自動產生的值。"
+    },
+    "complete": {
+      "title": "確認設定", "subtitle": "檢查以下設定，點擊「確認並啟動」完成設定。",
+      "modelConfig": "模型設定", "provider": "供應商", "defaultModel": "預設模型", "apiKey": "API Key",
+      "channelConfig": "通道設定", "channel": "通道", "webChatOnly": "僅 WebChat（已略過通道設定）", "configureViaUI": "設定完成後透過 Control UI 設定",
+      "gatewaySettings": "閘道設定", "port": "埠號", "bindAddress": "綁定位址", "authToken": "認證令牌",
+      "confirmStart": "確認並啟動", "retry": "重試", "edit": "編輯",
+      "writing": "正在寫入設定…", "starting": "正在啟動閘道（可能需要 1-5 分鐘），請稍候…",
+      "success": "閘道已就緒，正在跳轉…", "startHint": "閘道啟動可能需要 1-5 分鐘，請勿關閉此視窗。",
+      "errorConfig": "設定寫入失敗。請檢查磁碟空間和權限，然後重試。",
+      "errorAuth": "憑證寫入失敗。請檢查磁碟權限，然後重試。",
+      "errorGateway": "閘道啟動失敗。請檢查埠號是否被佔用或查看日誌。",
+      "errorGeneral": "操作失敗"
+    }
+  },
+  "shell": {
+    "dashboard": { "title": "儀表板", "subtitle": "閘道狀態、版本資訊和快速存取設定與日誌", "gateway": "閘道", "versions": "版本", "quickActions": "快速操作", "logs": "日誌", "logsDesc": "開啟日誌目錄", "diagnostics": "診斷", "diagnosticsDesc": "匯出診斷報告", "settings": "設定", "settingsDesc": "外觀、啟動、主題", "updates": "更新", "updatesDesc": "檢查新版本", "skills": "技能", "skillsDesc": "管理技能和擴充", "llmApi": "LLM API", "llmApiDesc": "供應商和認證設定", "recentError": "最近錯誤", "errorHint": "閘道服務異常退出。請檢查日誌或重試。" },
+    "settings": { "title": "設定", "closeToTray": "關閉時最小化到系統匣", "closeToTrayDesc": "關閉視窗後應用程式繼續在系統匣中運行", "autoStart": "登入時啟動", "autoStartDesc": "登入 Windows 時自動啟動 OpenClaw", "theme": "外觀主題", "themeDesc": "選擇應用程式的顯示主題", "system": "跟隨系統", "light": "淺色", "dark": "深色", "updateChannel": "更新通道", "updateChannelDesc": "選擇穩定版或 Beta 版搶先體驗", "stable": "穩定版", "beta": "測試版", "loading": "載入設定中…", "loadFailed": "載入設定失敗" },
+    "about": { "title": "關於", "shellVersion": "Shell 版本", "viewOnGithub": "在 GitHub 上查看專案", "fetchingVersions": "正在取得版本資訊…" },
+    "updates": { "title": "更新與維護", "checkForUpdates": "檢查更新", "checkHint": "檢查 GitHub 上是否有 OpenClaw Desktop 新版本。", "checkNow": "立即檢查", "checking": "正在檢查更新…", "checkFailed": "無法檢查更新", "newVersion": "發現新版本！", "current": "目前版本", "latest": "最新版本", "published": "發布時間", "downloadInstaller": "下載安裝包", "viewRelease": "檢視發布說明", "upToDate": "您正在使用最新版本 ({{version}})。", "checkAgain": "再次檢查", "bundleIntegrity": "捆綁包完整性", "verifying": "正在驗證捆綁包…", "bundleOk": "捆綁包完整且有效", "bundleIssues": "捆綁包存在問題", "nodeRuntime": "Node.js 執行環境", "openclawPackage": "OpenClaw 套件", "electronShell": "Electron 外殼", "appVersion": "應用程式版本", "missingFiles": "缺失檔案：", "reinstallHint": "重新安裝應用程式可以解決檔案缺失問題。", "reVerify": "重新驗證", "healthCheck": "系統健康檢查", "healthCheckHint": "執行全面健康檢查。", "runHealthCheck": "執行健康檢查", "runningCheck": "正在執行健康檢查…", "allPassed": "所有檢查已通過", "issuesDetected": "偵測到問題", "bundleIntegrityCheck": "捆綁包完整性", "configExists": "設定檔存在", "configValid": "設定有效", "errors": "錯誤：", "suggestions": "建議：", "reCheck": "重新檢查", "openLogDir": "開啟日誌目錄", "repairRollback": "修復與回滾", "reinstall": "重新安裝", "reinstallDesc": "如果捆綁包完整性檢查失敗，請從 GitHub Releases 頁面下載最新安裝包重新安裝。", "resetConfig": "重設設定", "resetConfigDesc": "如果設定損壞，請刪除設定檔並重啟應用程式。", "rollback": "回滾", "rollbackDesc": "要回滾到之前的版本，請從 GitHub Releases 頁面下載舊版安裝包。", "viewAllReleases": "查看所有版本" },
+    "loading": { "appName": "OpenClaw Desktop", "timeout": "閘道啟動逾時", "retry": "重試" },
+    "error": { "appName": "OpenClaw Desktop", "retry": "重試", "openLogDir": "開啟日誌目錄" },
+    "nav": { "dashboard": "儀表板", "dashboardDesc": "閘道狀態與版本", "llmApi": "LLM API", "llmApiDesc": "供應商與認證設定", "skills": "技能", "skillsDesc": "技能與擴充", "updates": "更新", "updatesDesc": "檢查更新", "settings": "設定", "settingsDesc": "外觀與啟動", "about": "關於", "aboutDesc": "版本資訊", "desktopManager": "桌面管理器", "desktopManagerDesc": "桌面版專屬功能與設定", "backToControlUI": "Control UI" },
+    "status": { "starting": "啟動中…", "running": "運行中", "stopped": "已停止", "error": "錯誤", "loadingVersions": "正在載入版本資訊…", "comingSoon": "即將推出" }
+  }
+}

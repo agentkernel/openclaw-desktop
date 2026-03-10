@@ -1,0 +1,17 @@
+node_modules
+dist
+out
+build
+resources/node/
+resources/openclaw/
+.DS_Store
+*.log
+.env
+.env.local
+certs/
+*.local
+
+# Development reference code (not part of the project)
+openclaw-main/
+.temp-openclaw/
+cobrain/
