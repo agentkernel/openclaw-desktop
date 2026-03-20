@@ -1,7 +1,7 @@
 /**
- * OpenClaw 主配置读写
- * 路径：%USERPROFILE%\.openclaw\openclaw.json（JSON5 格式）
- * 参考：OpenClaw config/io.ts loadConfig 流程
+ * OpenClaw main config read/write.
+ * Path: %USERPROFILE%\.openclaw\openclaw.json (JSON5).
+ * Aligned with upstream OpenClaw config/io load flow.
  */
 
 import fs from 'node:fs'
@@ -101,9 +101,9 @@ function migrateLegacyProviderConfig(config: OpenClawConfig): { config: OpenClaw
 }
 
 /**
- * 读取 OpenClaw 主配置
- * - 文件不存在 → 返回 {}
- * - 解析失败（损坏）→ 返回 {} 并记录警告
+ * Read OpenClaw main config.
+ * - Missing file → {}
+ * - Parse error → {} + warning
  */
 export function readOpenClawConfig(): OpenClawConfig {
   const configPath = getOpenClawConfigPath()
@@ -139,8 +139,7 @@ export function readOpenClawConfig(): OpenClawConfig {
 }
 
 /**
- * 写入 OpenClaw 主配置
- * 使用标准 JSON 格式输出（便于工具兼容）
+ * Write OpenClaw main config as standard JSON (tool-friendly).
  */
 export function writeOpenClawConfig(config: OpenClawConfig): void {
   const configPath = getOpenClawConfigPath()
@@ -158,9 +157,7 @@ export function writeOpenClawConfig(config: OpenClawConfig): void {
   }
 }
 
-/**
- * 检查 OpenClaw 配置文件是否存在
- */
+/** Whether the OpenClaw config file exists */
 export function openclawConfigExists(): boolean {
   return fs.existsSync(getOpenClawConfigPath())
 }

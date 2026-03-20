@@ -1,6 +1,4 @@
-/**
- * Main 进程工具函数 — 统一导出
- */
+/** Main-process util re-exports */
 
 export {
   getInstallDir,

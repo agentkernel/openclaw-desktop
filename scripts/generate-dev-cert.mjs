@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * 生成自签名代码签名证书（.pfx）
- * 仅用于开发/测试：不会消除 SmartScreen 警告，但可验证签名流程
- * 公开分发请使用商业证书或 SignPath Foundation（开源项目）
+ * Generate a self-signed code-signing .pfx for dev/test (SmartScreen may still warn).
+ * Public releases: use a commercial cert or programs like SignPath for OSS.
  */
 import { execSync, spawnSync } from 'node:child_process'
 import { writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs'
@@ -92,22 +91,22 @@ Remove-Item -Path "cert:\\currentuser\\my\\$($cert.Thumbprint)" -Force`
 
 async function main() {
   if (existsSync(certPath)) {
-    console.log('证书已存在:', certPath)
-    console.log('若要重新生成，请先删除该文件。\n')
+    console.log('Certificate already exists:', certPath)
+    console.log('Delete the file to regenerate.\n')
     printNextSteps(certPath)
     return
   }
 
   mkdirSync(certDir, { recursive: true })
-  console.log('正在生成自签名代码签名证书...\n')
+  console.log('Generating self-signed code-signing certificate...\n')
 
   if (genWithOpenSSL()) {
-    console.log('\n✓ 使用 OpenSSL 生成成功')
+    console.log('\n✓ Generated with OpenSSL')
   } else if (genWithPowerShell()) {
-    console.log('\n✓ 使用 PowerShell 生成成功')
+    console.log('\n✓ Generated with PowerShell')
   } else {
-    console.error('\n错误: 未找到 OpenSSL，且 PowerShell 生成失败。')
-    console.error('请安装 Git for Windows（含 OpenSSL）或检查 PowerShell 权限。')
+    console.error('\nError: OpenSSL not found and PowerShell generation failed.')
+    console.error('Install Git for Windows (includes OpenSSL) or check PowerShell permissions.')
     process.exit(1)
   }
 
@@ -116,14 +115,14 @@ async function main() {
 
 function printNextSteps(pfxPath) {
   const absPath = pfxPath.replace(/\\/g, '/')
-  console.log('下一步：')
-  console.log('  1. 复制 .env.example 为 .env')
-  console.log('  2. 在 .env 中填入：')
+  console.log('Next steps:')
+  console.log('  1. Copy .env.example to .env')
+  console.log('  2. Set in .env:')
   console.log(`     CSC_LINK=file:///${absPath}`)
   console.log('     CSC_KEY_PASSWORD=openclaw-dev')
-  console.log('  3. 运行: pnpm run package:win:signed')
+  console.log('  3. Run: pnpm run package:win:signed')
   console.log('')
-  console.log('注意: 自签名证书不会消除 SmartScreen 警告，仅用于验证签名流程。')
+  console.log('Note: Self-signed certs do not remove SmartScreen warnings; they only exercise the signing path.')
 }
 
 main().catch((e) => {

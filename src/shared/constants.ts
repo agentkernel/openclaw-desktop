@@ -1,19 +1,19 @@
 /**
- * 共享常量 — Main 与 Renderer 共用
- * 与 OpenClaw 官方路径约定一致
+ * Shared constants — main and renderer.
+ * Path layout matches upstream OpenClaw conventions.
  */
 
-/** Gateway 默认端口 */
+/** Default gateway listen port */
 export const DEFAULT_GATEWAY_PORT = 18789
 
-/** OpenClaw 用户数据目录名（相对 %USERPROFILE%） */
+/** OpenClaw state directory under %USERPROFILE% */
 export const OPENCLAW_USER_DIR = '.openclaw'
 
-/** 外壳应用名（用于 %APPDATA% 子目录） */
+/** Shell product name (under %APPDATA%) */
 export const APP_NAME = 'OpenClaw Desktop'
 
-/** OpenClaw 主配置文件名 */
+/** Main OpenClaw config filename */
 export const OPENCLAW_CONFIG_FILE = 'openclaw.json'
 
-/** 外壳配置文件相对路径（相对于 app.getPath('userData')） */
+/** Shell config file relative to app.getPath('userData') */
 export const SHELL_CONFIG_FILE = 'config.json'

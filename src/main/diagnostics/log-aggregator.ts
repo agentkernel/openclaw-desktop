@@ -1,6 +1,4 @@
-/**
- * 结构化日志聚合器 — 环形缓冲区，供诊断包导出与 UI 查询
- */
+/** Ring buffer of structured logs for diagnostics export and UI */
 
 export interface StructuredLog {
   timestamp: string

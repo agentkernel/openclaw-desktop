@@ -1,6 +1,5 @@
 /**
- * Gateway 日志行解析 — 将 stdout/stderr 行解析为 StructuredLog
- * 支持 JSON 行（pino 格式）和纯文本
+ * Parse gateway stdout/stderr lines into StructuredLog (JSON/pino or plain text).
  */
 
 import type { StructuredLog } from '../diagnostics/log-aggregator.js'
@@ -15,11 +14,7 @@ function normalizeLevel(level: unknown): LogLevel {
   return 'info'
 }
 
-/**
- * 解析 Gateway 输出行为 StructuredLog
- * @param line 原始行内容
- * @param stream stdout 或 stderr
- */
+/** Parse one gateway log line into StructuredLog. */
 export function parseGatewayLogLine(line: string, stream: 'stdout' | 'stderr'): StructuredLog {
   const fallbackLevel: LogLevel = stream === 'stderr' ? 'error' : 'info'
   const fallbackTimestamp = new Date().toISOString()

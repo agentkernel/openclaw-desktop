@@ -1,6 +1,4 @@
-/**
- * 注册表服务 — 统一编排扫描、校验
- */
+/** Orchestrate registry scan + validation */
 
 import fs from 'node:fs'
 import type {
@@ -38,7 +36,7 @@ export function listExtensions(
 }
 
 /**
- * 基础校验：检查 manifest 存在性、JSON 合法性
+ * Basic validation: manifest exists, JSON parses
  */
 export function validateRegistryItem(
   deps: RegistryServiceDeps,

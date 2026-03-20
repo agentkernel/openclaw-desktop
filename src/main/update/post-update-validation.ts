@@ -1,6 +1,6 @@
 /**
- * 安装后校验 — 检测 marker、执行 doctor+bundle 校验、写入结果
- * 供 Update Center 展示回滚指引与诊断包导出入口
+ * Post-update validation: marker file, doctor + bundle checks, persisted result.
+ * Surfaces rollback hints and diagnostics export in Update Center.
  */
 
 import fs from 'node:fs'
@@ -12,10 +12,10 @@ import { getUserDataDir } from '../utils/paths.js'
 const MARKER_FILE = '.post-update-pending'
 const RESULT_FILE = '.post-update-result.json'
 
-const ROLLBACK_GUIDANCE = `若更新后应用无法正常使用：
-1. 使用「导出诊断包」保存当前状态，便于排查
-2. 从备份恢复：打开备份目录（%USERPROFILE%\\.openclaw\\backups），使用 openclaw backup restore 命令恢复
-3. 或从 GitHub Releases 下载上一版本安装包重新安装`
+const ROLLBACK_GUIDANCE = `If the app does not work after an update:
+1. Use "Export diagnostics" to capture the current state for troubleshooting.
+2. Restore from backup: open %USERPROFILE%\\.openclaw\\backups and run openclaw backup restore.
+3. Or download the previous installer from GitHub Releases and reinstall.`
 
 export interface PostUpdateValidationDeps {
   readOpenClawConfig: () => { gateway?: { port?: number } }
@@ -38,9 +38,7 @@ function getResultPath(): string {
   return path.join(getUserDataDir(), RESULT_FILE)
 }
 
-/**
- * 安装前调用：写入 marker，表示即将执行更新安装
- */
+/** Call before install: write marker indicating an update install is about to run */
 export function writePostUpdateMarker(): void {
   try {
     const markerPath = getMarkerPath()
@@ -54,9 +52,7 @@ export function writePostUpdateMarker(): void {
   }
 }
 
-/**
- * 安装后启动时调用：若存在 marker，执行 doctor+bundle 校验并写入结果
- */
+/** On startup after update: if marker exists, run doctor + bundle checks and persist result */
 export async function runPostUpdateValidationIfNeeded(
   deps: PostUpdateValidationDeps,
 ): Promise<void> {
@@ -68,7 +64,7 @@ export async function runPostUpdateValidationIfNeeded(
   try {
     fs.unlinkSync(markerPath)
   } catch {
-    // 忽略删除失败
+    // Ignore delete errors
   }
 
   const resultPath = getResultPath()
@@ -104,9 +100,7 @@ export async function runPostUpdateValidationIfNeeded(
   }
 }
 
-/**
- * 供 IPC 使用：读取并消费安装后校验结果（一次性）
- */
+/** IPC: read and consume post-update validation result (one-shot) */
 export function readAndConsumePostUpdateResult(): PostUpdateValidationResult | null {
   const resultPath = getResultPath()
   if (!fs.existsSync(resultPath)) {
@@ -123,7 +117,11 @@ export function readAndConsumePostUpdateResult(): PostUpdateValidationResult | n
       rollbackGuidance: parsed.rollbackGuidance ?? ROLLBACK_GUIDANCE,
     }
   } catch {
-    try { fs.unlinkSync(resultPath) } catch { /* ignore */ }
+    try {
+      fs.unlinkSync(resultPath)
+    } catch {
+      /* ignore */
+    }
     return null
   }
 }

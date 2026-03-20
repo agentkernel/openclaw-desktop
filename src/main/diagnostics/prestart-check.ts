@@ -1,5 +1,5 @@
 /**
- * 启动前校验 — bundle 完整性 + config 存在性 + config 可解析
+ * Pre-start validation: bundle integrity, config presence, JSON5 parse.
  */
 
 import path from 'node:path'
@@ -30,7 +30,7 @@ export function runPrestartCheck(): PrestartCheckResult {
 
   if (!bundleCheck.ok) {
     errors.push(`Bundle incomplete: missing ${bundleCheck.missing.join(', ')}`)
-    fixSuggestions.push('OpenClaw 资源不完整，请重新安装应用。')
+    fixSuggestions.push('OpenClaw bundle is incomplete. Reinstall the application.')
     aggregator.append('install-validation', 'error', `Bundle check failed: ${bundleCheck.missing.join(', ')}`)
   } else {
     aggregator.append('install-validation', 'info', 'Bundle check passed')
@@ -52,7 +52,7 @@ export function runPrestartCheck(): PrestartCheckResult {
       aggregator.append('install-validation', 'info', 'Config parse check passed')
     } catch (err) {
       errors.push(`openclaw.json parse error: ${err instanceof Error ? err.message : String(err)}`)
-      fixSuggestions.push('openclaw.json 格式错误，请检查或删除后重新运行向导。')
+      fixSuggestions.push('openclaw.json is invalid. Fix or remove it and run the setup wizard again.')
       aggregator.append('install-validation', 'error', `Config parse failed: ${err instanceof Error ? err.message : String(err)}`)
     }
   }

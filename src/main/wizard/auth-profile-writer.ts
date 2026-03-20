@@ -1,8 +1,8 @@
 /**
- * Auth Profile 写入器
- * 路径：%USERPROFILE%\.openclaw\agents\main\agent\auth-profiles.json
- * 与 OpenClaw 原生一致（auth-profiles/paths.ts → resolveOpenClawAgentDir() + AUTH_PROFILE_FILENAME）
- * 格式与 OpenClaw CLI `openclaw onboard` 输出完全一致
+ * Auth profile writer.
+ * Path: %USERPROFILE%\.openclaw\agents\main\agent\auth-profiles.json
+ * Matches upstream auth-profiles paths (resolveOpenClawAgentDir + AUTH_PROFILE_FILENAME).
+ * Same shape as `openclaw onboard` output.
  */
 
 import fs from 'node:fs'
@@ -11,7 +11,7 @@ import { getUserDataDir } from '../utils/paths.js'
 
 const AUTH_STORE_VERSION = 1
 const AUTH_PROFILE_FILENAME = 'auth-profiles.json'
-/** 与 OpenClaw agent-paths.ts resolveOpenClawAgentDir 一致：{stateDir}/agents/main/agent */
+/** Same as upstream resolveOpenClawAgentDir: {stateDir}/agents/main/agent */
 const AGENT_AUTH_DIR = ['agents', 'main', 'agent']
 
 interface ApiKeyCredential {
@@ -42,7 +42,7 @@ function resolveAuthStorePath(): string {
   return path.join(resolveAgentAuthDir(), AUTH_PROFILE_FILENAME)
 }
 
-/** 历史错误路径（已废弃）：credentials/auth-profiles.json（早期误用 resolveOAuthDir） */
+/** Legacy path (deprecated): credentials/auth-profiles.json from early resolveOAuthDir misuse */
 function resolveLegacyAuthStorePath(): string {
   return path.join(getUserDataDir(), 'credentials', AUTH_PROFILE_FILENAME)
 }

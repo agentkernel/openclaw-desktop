@@ -4,7 +4,7 @@ import App from './App'
 import { initI18n } from './i18n'
 import './styles/globals.css'
 
-// 诊断：若控制台能看到此行，说明外壳渲染进程已加载
+// Debug: if this prints, the shell renderer loaded
 console.info('[OpenClaw] Renderer started', typeof window.electronAPI !== 'undefined' ? '(IPC OK)' : '(IPC missing)')
 
 async function bootstrap(): Promise<void> {

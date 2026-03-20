@@ -4,7 +4,7 @@ import { ShellLayout } from './ShellLayout'
 import type { ShellConfig, ShellTheme } from '../../shared/types'
 
 export interface SettingsViewProps {
-  /** 嵌入模式时由父组件提供的返回回调 */
+  /** Back navigation when embedded in parent layout */
   onBack?: () => void
 }
 

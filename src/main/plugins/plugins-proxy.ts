@@ -1,6 +1,5 @@
 /**
- * Plugins 状态代理 — 通过 bundled node.exe 执行 openclaw plugins CLI
- * 获取插件清单，支持 enable/disable/install/uninstall
+ * Plugins via bundled `openclaw plugins` CLI (list/enable/disable/install/uninstall).
  */
 
 import { spawn } from 'node:child_process'
@@ -93,7 +92,7 @@ function mapCliPluginToInfo(raw: Record<string, unknown>): PluginInfo {
 }
 
 /**
- * 获取插件清单 — 执行 openclaw plugins list --json
+ * `openclaw plugins list --json`
  */
 export async function listPluginsWithCli(): Promise<{ plugins: PluginInfo[]; workspaceDir?: string }> {
   try {
@@ -114,7 +113,7 @@ export async function listPluginsWithCli(): Promise<{ plugins: PluginInfo[]; wor
 }
 
 /**
- * 启用插件 — openclaw plugins enable <id>
+ * `plugins enable <id>`
  */
 export async function enablePlugin(id: string): Promise<{ ok: boolean; message?: string }> {
   const { exitCode, stderr } = await runPluginsCli(['enable', id])
@@ -125,7 +124,7 @@ export async function enablePlugin(id: string): Promise<{ ok: boolean; message?:
 }
 
 /**
- * 禁用插件 — openclaw plugins disable <id>
+ * `plugins disable <id>`
  */
 export async function disablePlugin(id: string): Promise<{ ok: boolean; message?: string }> {
   const { exitCode, stderr } = await runPluginsCli(['disable', id])
@@ -136,15 +135,14 @@ export async function disablePlugin(id: string): Promise<{ ok: boolean; message?
 }
 
 /**
- * 切换插件启用状态
+ * Toggle enabled flag
  */
 export async function togglePlugin(id: string, enabled: boolean): Promise<{ ok: boolean; message?: string }> {
   return enabled ? enablePlugin(id) : disablePlugin(id)
 }
 
 /**
- * 安装插件 — openclaw plugins install <spec>
- * spec 可为本地路径、archive 或 npm 包名
+ * `plugins install <spec>` — path, archive, or npm spec
  */
 export async function installPlugin(spec: string): Promise<{ ok: boolean; pluginId?: string; message?: string }> {
   const trimmed = spec?.trim()
@@ -157,7 +155,7 @@ export async function installPlugin(spec: string): Promise<{ ok: boolean; plugin
     if (exitCode !== 0) {
       return { ok: false, message: combined || `Exit code ${exitCode}` }
     }
-    // 尝试从输出解析 "Installed plugin: <id>"
+    // Parse "Installed plugin: <id>" from stdout
     const match = combined.match(/Installed plugin:\s*([^\s]+)/i)
     const pluginId = match?.[1]
     return { ok: true, pluginId, message: combined || undefined }
@@ -170,7 +168,7 @@ export async function installPlugin(spec: string): Promise<{ ok: boolean; plugin
 }
 
 /**
- * 卸载插件 — openclaw plugins uninstall <id> --force
+ * `plugins uninstall <id> --force`
  */
 export async function uninstallPlugin(
   id: string,

@@ -1,6 +1,6 @@
 /**
- * 模型连接测试器 — 向各 Provider API 发送轻量测试请求
- * 支持 Anthropic / OpenAI / OpenAI Codex / Google(Gemini) / OpenRouter / Custom
+ * Model connectivity probe — lightweight request per provider.
+ * Supports Anthropic, OpenAI, OpenAI Codex, Google (Gemini), OpenRouter, custom bases.
  */
 
 import type { ModelConfig } from '../../shared/types.js'
@@ -150,13 +150,13 @@ function buildCustomProviderConfig(
 
 function resolveErrorMessage(status: number, body: unknown): string {
   if (status === 401 || status === 403) {
-    return 'API Key 无效或无权限'
+    return 'API key is invalid or not authorized'
   }
   if (status === 429) {
-    return '请求频率受限，请稍后重试'
+    return 'Rate limited — try again later'
   }
   if (status === 404) {
-    return '模型不存在或不可用'
+    return 'Model not found or unavailable'
   }
 
   if (body && typeof body === 'object') {
@@ -170,24 +170,24 @@ function resolveErrorMessage(status: number, body: unknown): string {
     }
   }
 
-  return `请求失败 (HTTP ${status})`
+  return `Request failed (HTTP ${status})`
 }
 
 export async function testModelConnection(
   config: ModelConfig,
 ): Promise<WizardTestModelResult> {
   if (!config.provider || !config.apiKey?.trim() || !config.modelId?.trim()) {
-    return { ok: false, message: '请填写完整的模型配置' }
+    return { ok: false, message: 'Complete the model configuration' }
   }
 
   if (config.provider === 'custom') {
     const baseUrl = config.customBaseUrl?.trim()
     const compatibility = config.customCompatibility ?? 'openai'
     if (!baseUrl) {
-      return { ok: false, message: '请填写自定义 Provider 的 Base URL' }
+      return { ok: false, message: 'Enter a base URL for the custom provider' }
     }
     if (!config.customProviderId?.trim()) {
-      return { ok: false, message: '请填写自定义 Provider 的 ID' }
+      return { ok: false, message: 'Enter an ID for the custom provider' }
     }
     const providerConfig = buildCustomProviderConfig(baseUrl, compatibility)
     return runTestRequest(providerConfig, config)
@@ -195,7 +195,7 @@ export async function testModelConnection(
 
   const providerConfig = PROVIDER_CONFIGS[config.provider]
   if (!providerConfig) {
-    return { ok: false, message: `该提供商暂不支持自动测试: ${config.provider}` }
+    return { ok: false, message: `Automatic test not supported for provider: ${config.provider}` }
   }
 
   return runTestRequest(providerConfig, config)
@@ -232,7 +232,7 @@ async function runTestRequest(
     })
 
     if (response.ok) {
-      return { ok: true, message: '连接成功' }
+      return { ok: true, message: 'Connection succeeded' }
     }
 
     let responseBody: unknown
@@ -248,13 +248,13 @@ async function runTestRequest(
     }
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
-      return { ok: false, message: '连接超时，请检查网络或代理设置' }
+      return { ok: false, message: 'Connection timed out — check network or proxy settings' }
     }
     const message = err instanceof Error ? err.message : String(err)
     if (message.includes('fetch failed') || message.includes('ENOTFOUND')) {
-      return { ok: false, message: '网络连接失败，请检查网络设置' }
+      return { ok: false, message: 'Network error — check connectivity' }
     }
-    return { ok: false, message: `连接失败: ${message}` }
+    return { ok: false, message: `Connection failed: ${message}` }
   } finally {
     clearTimeout(timeoutId)
   }

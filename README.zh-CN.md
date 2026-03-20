@@ -54,6 +54,7 @@
 
 ### 0.1.1
 
+- **OpenClaw 运行时：** 捆绑的 OpenClaw 已更新至最新版本 `2026.3.13`，桌面端已支持最新版 OpenClaw 运行时。
 - **Kuae（夸娥云编程套餐）与 HTTPS 代理：** 捆绑的 OpenClaw **网关**子进程会继承系统 `HTTP(S)_PROXY`；部分本机代理会导致访问 Kuae API（`coding-plan-endpoint.kuaecloud.net`）时 TLS 失败。桌面端在启动网关时会自动**合并** `NO_PROXY` / `no_proxy`，加入 `coding-plan-endpoint.kuaecloud.net` 与 `.kuaecloud.net`，使 Kuae 相关请求**直连**，其它厂商仍按原代理设置。调试可设置环境变量 `OPENCLAW_SKIP_KUAE_NO_PROXY=1` 关闭该合并。详见 [FAQ → Kuae 与 HTTPS 代理](#faq)。
 - **文档：** README 中增加上述说明（中英 FAQ / Changelog）。
 

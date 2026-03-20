@@ -1,6 +1,6 @@
 /**
- * Provider 预设 — LLM API 管理页面与向导共用
- * 与 ModelStep 的 PROVIDERS/MODELS_BY_PROVIDER 保持同步
+ * Provider presets — shared by LLM API settings and wizard.
+ * Keep in sync with ModelStep PROVIDERS / MODELS_BY_PROVIDER.
  */
 
 import type { ModelProvider } from '../../shared/types'
@@ -27,8 +27,8 @@ export const PROVIDER_OPTIONS: readonly ProviderOption[] = [
   { id: 'cloudflare-ai-gateway', label: 'Cloudflare AI Gateway', placeholder: 'cf-...' },
   { id: 'minimax', label: 'MiniMax', placeholder: 'minimax-...' },
   { id: 'synthetic', label: 'Synthetic', placeholder: 'synthetic-...' },
-  { id: 'moonshot', label: 'Moonshot (Kimi) 全球', placeholder: 'moonshot-...' },
-  { id: 'moonshot-cn', label: 'Moonshot (Kimi) 中国区', placeholder: 'moonshot-...' },
+  { id: 'moonshot', label: 'Moonshot (Kimi) Global', placeholder: 'moonshot-...' },
+  { id: 'moonshot-cn', label: 'Moonshot (Kimi) China', placeholder: 'moonshot-...' },
   { id: 'kimi-coding', label: 'Kimi Coding', placeholder: 'kimi-...' },
   { id: 'openrouter', label: 'OpenRouter', placeholder: 'sk-or-...' },
   { id: 'mistral', label: 'Mistral', placeholder: 'mistral-...' },
@@ -58,7 +58,7 @@ export const PROVIDER_OPTIONS: readonly ProviderOption[] = [
   { id: 'vllm', label: 'vLLM (Local)', placeholder: 'your-model-id' },
   { id: 'lmstudio', label: 'LM Studio (Local)', placeholder: 'your-model-id' },
   { id: 'xiaomi', label: 'Xiaomi MiMo', placeholder: 'xiaomi-...' },
-  { id: 'kuae', label: '夸娥云 (Kuae 编程套餐)', placeholder: 'your_api_key' },
+  { id: 'kuae', label: 'Kuae (Coding Plan)', placeholder: 'your_api_key' },
   { id: 'custom', label: 'Custom (OpenAI/Anthropic Compatible)', placeholder: 'Enter API Key' },
 ] as const
 

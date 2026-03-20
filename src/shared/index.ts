@@ -1,5 +1,5 @@
 /**
- * 共享模块入口 — Main / Preload / Renderer 共用
+ * Shared package entry — main, preload, and renderer.
  */
 
 export * from './types'

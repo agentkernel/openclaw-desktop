@@ -74,6 +74,7 @@
 
 ### 0.1.1
 
+- **OpenClaw runtime:** Bundled OpenClaw has been updated to the latest version `2026.3.13`, and the desktop app now supports the latest OpenClaw runtime.
 - **Kuae (夸娥云 Coding Plan) & HTTPS proxy:** When the bundled OpenClaw **gateway** child process inherits system `HTTP(S)_PROXY`, some local proxies break TLS to Kuae’s API (`coding-plan-endpoint.kuaecloud.net`). The desktop app now **merges** `NO_PROXY` / `no_proxy` for `coding-plan-endpoint.kuaecloud.net` and `.kuaecloud.net` on gateway spawn so Kuae traffic can go **direct** while other providers still follow your proxy settings. Set `OPENCLAW_SKIP_KUAE_NO_PROXY=1` to disable this merge. See [FAQ → Kuae and HTTPS proxy](#faq).
 - **文档 / Docs:** README FAQ entry for the above behavior (English + 简体中文).
 

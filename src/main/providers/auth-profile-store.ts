@@ -1,6 +1,5 @@
 /**
- * Auth Profile 管理 — 列表、保存、删除、导入导出
- * 与 auth-profile-writer 共用存储路径和格式，供 LLM API 管理 UI 使用
+ * Auth profiles: list/save/delete/import/export (same store as auth-profile-writer, LLM API UI).
  */
 
 import fs from 'node:fs'
@@ -108,13 +107,12 @@ export interface AuthProfileItem {
   profileId: string
   provider: string
   hasKey: boolean
-  /** 脱敏后的 key 预览，仅当 maskKeys 时返回 */
+  /** Masked key preview when maskKeys is true */
   keyPreview?: string
 }
 
 /**
- * 列表所有 auth profile，key/token 脱敏
- * 支持 api_key 与 token 两种凭证类型（与原生 auth-profiles store 兼容）
+ * List profiles with redacted secrets (api_key + token shapes)
  */
 export function listAuthProfiles(maskKeys = true): AuthProfileItem[] {
   const store = loadStore()
@@ -130,7 +128,7 @@ export function listAuthProfiles(maskKeys = true): AuthProfileItem[] {
 }
 
 /**
- * 保存或更新 auth profile
+ * Upsert api_key profile
  */
 export function saveAuthProfile(profileId: string, provider: string, apiKey: string): void {
   const store = loadStore()
@@ -143,8 +141,7 @@ export function saveAuthProfile(profileId: string, provider: string, apiKey: str
 }
 
 /**
- * 保存 token 凭证（如 copilot-proxy:local）
- * 与 auth-profile-writer.writeAuthProfileToken 格式一致
+ * Save token profile (e.g. copilot-proxy:local)
  */
 export function saveAuthProfileToken(profileId: string, provider: string, token: string): void {
   const store = loadStore()
@@ -157,7 +154,7 @@ export function saveAuthProfileToken(profileId: string, provider: string, token:
 }
 
 /**
- * 删除 auth profile
+ * Delete profile by id
  */
 export function deleteAuthProfile(profileId: string): void {
   const store = loadStore()
@@ -170,7 +167,7 @@ export interface ExportAuthProfilesOptions {
 }
 
 /**
- * 导出 auth profiles 为 JSON 字符串
+ * Serialize store to JSON
  */
 export function exportAuthProfiles(opts: ExportAuthProfilesOptions = {}): string {
   const { maskKeys = true } = opts
@@ -201,7 +198,7 @@ export interface ImportAuthProfilesResult {
 }
 
 /**
- * 从 JSON 字符串导入 auth profiles，合并到现有 store（冲突覆盖）
+ * Import JSON into store (overwrites on conflict)
  */
 export function importAuthProfiles(json: string): ImportAuthProfilesResult {
   const errors: string[] = []

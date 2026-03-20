@@ -233,14 +233,14 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
           </section>
         )}
 
-        {/* Check for updates — 单通道布局 */}
+        {/* Check for updates — single-column layout */}
         <section className="rounded-lg border border-border bg-card p-5" aria-label="Check for updates">
           <div className="flex items-center gap-2 mb-4">
             <ArrowUpCircle className="w-5 h-5 text-primary" aria-hidden />
             <h2 className="text-base font-semibold">Check for Updates</h2>
           </div>
 
-          {/* 安装后校验结果（重启后展示） */}
+          {/* Post-update validation (after restart) */}
           {postUpdateResult && postUpdateResult.ran && (
             <div className={`rounded-md border p-3 mb-4 ${postUpdateResult.ok ? 'border-green-500/30 bg-green-500/5' : 'border-destructive/30 bg-destructive/5'}`}>
               <div className="flex items-center gap-2 text-sm font-medium mb-1">
@@ -301,7 +301,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                 </div>
               ) : hasUpdate ? (
                 <>
-                  {/* 当前版本 → 可用版本 */}
+                  {/* Current → available version */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-muted-foreground">
                       Current: <span className="font-mono font-medium">{currentVersionDisplay}</span>
@@ -326,7 +326,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                     </div>
                   )}
 
-                  {/* 下载进度 */}
+                  {/* Download progress */}
                   {installFlow === 'downloading' && (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between text-sm">
@@ -366,7 +366,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                     </div>
                   )}
 
-                  {/* 下载完成 → 安装重启 */}
+                  {/* Download done → install & restart */}
                   {installFlow === 'downloaded' && (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
@@ -380,7 +380,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                     </div>
                   )}
 
-                  {/* 安装确认对话框 */}
+                  {/* Install confirmation */}
                   {installFlow === 'confirming' && (
                     <div className="rounded-md border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20 p-4 flex flex-col gap-3">
                       <p className="text-sm font-medium">
@@ -404,7 +404,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                     </div>
                   )}
 
-                  {/* 失败状态与回滚指引 */}
+                  {/* Failure + rollback hints */}
                   {installFlow === 'error' && (
                     <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 flex flex-col gap-3">
                       <div className="flex items-start gap-2 text-sm">
@@ -427,7 +427,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
                     </div>
                   )}
 
-                  {/* 初始：下载并安装 或 外部下载 */}
+                  {/* Initial: in-app download or external installer */}
                   {installFlow === 'idle' && (
                     <div className="flex flex-col gap-2">
                       <Button size="sm" onClick={handleDownloadAndInstall}>
@@ -473,7 +473,7 @@ export function UpdateView({ onBack, updateAvailable, updateVersion, updateNotes
           )}
         </section>
 
-        {/* Bundle verification — 独立区块 */}
+        {/* Bundle verification — separate section */}
         <section className="rounded-lg border border-border bg-card p-5" aria-label="Bundle verification">
           <div className="flex items-center gap-2 mb-4">
             <Package className="w-5 h-5 text-primary" aria-hidden />

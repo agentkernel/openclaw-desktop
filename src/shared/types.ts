@@ -1,11 +1,11 @@
 /**
- * 共享类型定义 — Main 与 Renderer 共用
- * 与 OpenClaw 官方配置格式兼容
+ * Shared types — used by main and renderer processes.
+ * Compatible with upstream OpenClaw configuration shape.
  */
 
 // ─── ShellConfig ─────────────────────────────────────────────────────────────
 
-/** 窗口位置和大小 */
+/** Window position and size */
 export interface WindowBounds {
   x: number
   y: number
@@ -14,87 +14,87 @@ export interface WindowBounds {
   maximized: boolean
 }
 
-/** 外壳主题 */
+/** Desktop shell theme */
 export type ShellTheme = 'system' | 'light' | 'dark'
 
-/** 更新通道 */
+/** Update channel */
 export type UpdateChannel = 'stable' | 'beta'
 
-/** 桌面外壳自身配置，存储在 %APPDATA%\OpenClaw Desktop\config.json */
+/** Desktop shell settings stored in %APPDATA%\OpenClaw Desktop\config.json */
 export interface ShellConfig {
   closeToTray: boolean
   autoStart: boolean
   theme: ShellTheme
   lastGatewayPort: number
   updateChannel: UpdateChannel
-  /** 首次向导完成后，是否已执行过主界面展开（一次性） */
+  /** After first-run wizard: whether main-window expand ran once */
   onboardingMainWindowExpanded?: boolean
-  /** 是否自动检查更新，默认 true */
+  /** Whether to check for updates automatically; default true */
   autoCheckUpdates?: boolean
-  /** 上次检查更新时间（ISO 8601） */
+  /** Last update check time (ISO 8601) */
   lastUpdateCheck?: string
   windowBounds: WindowBounds
 }
 
 // ─── OpenClawConfig ───────────────────────────────────────────────────────────
 
-/** Gateway 认证配置 */
+/** Gateway authentication config */
 export interface GatewayAuthConfig {
   mode?: 'token' | 'password' | 'none'
   token?: string
 }
 
-/** Gateway 配置 */
+/** Gateway config */
 export interface GatewayConfig {
-  /** 与原生 doctor 期望一致：local（桌面壳）或 remote */
+  /** Matches upstream doctor: local (desktop shell) or remote */
   mode?: 'local' | 'remote'
   port?: number
   bind?: 'loopback' | 'lan' | 'auto'
   auth?: GatewayAuthConfig
-  /** 端口冲突时是否自动传递 --force（与原生 gateway run 对齐） */
+  /** When true, pass --force on port conflict (aligned with gateway run) */
   forcePortOnConflict?: boolean
 }
 
-/** Auth 配置中的 profile 选择项（与原生 OpenClaw 对齐） */
+/** Auth profile selection entry (aligned with upstream OpenClaw) */
 export interface AuthProfileSelection {
   provider: string
   mode: 'api_key' | 'oauth' | 'token'
   email?: string
 }
 
-/** Auth 配置（与原生 OpenClaw 对齐） */
+/** Auth config (aligned with upstream OpenClaw) */
 export interface AuthConfig {
   profiles?: Record<string, AuthProfileSelection>
   order?: Record<string, string[]>
 }
 
-/** 默认模型配置 */
+/** Default model settings */
 export interface AgentModelDefaults {
   primary?: string
-  /** 降级模型链（provider/model 格式） */
+  /** Fallback model chain (provider/model) */
   fallbacks?: string[]
 }
 
-/** 默认模型别名配置 */
+/** Default model alias entry */
 export interface AgentModelAlias {
   alias?: string
 }
 
-/** Agent 默认配置 */
+/** Agent defaults */
 export interface AgentDefaultsConfig {
-  /** CLI 兼容：允许 model 为字符串（provider/model） */
+  /** CLI compatibility: model may be a string (provider/model) */
   model?: AgentModelDefaults | string
-  /** 可选：模型别名映射（例如 moonshot/kimi-k2.5） */
+  /** Optional model alias map (e.g. moonshot/kimi-k2.5) */
   models?: Record<string, AgentModelAlias>
   workspace?: string
 }
 
-/** Agents 配置 */
+/** Agents section */
 export interface AgentsConfig {
   defaults?: AgentDefaultsConfig
 }
 
-/** 飞书通道配置 */
+/** Feishu (Lark) channel config */
 export interface FeishuChannelConfig {
   appId?: string
   appSecret?: string
@@ -102,17 +102,17 @@ export interface FeishuChannelConfig {
   encryptKey?: string
 }
 
-/** 向导用 Telegram 配置（与原生 TelegramConfig 对齐） */
+/** Wizard Telegram channel (aligned with upstream TelegramConfig) */
 export interface TelegramChannelConfig {
   botToken?: string
 }
 
-/** 向导用 Discord 配置（与原生 DiscordConfig 对齐） */
+/** Wizard Discord channel (aligned with upstream DiscordConfig) */
 export interface DiscordChannelConfig {
   token?: string
 }
 
-/** 向导用 Slack 配置（与原生 SlackConfig 对齐） */
+/** Wizard Slack channel (aligned with upstream SlackConfig) */
 export interface SlackChannelConfig {
   mode?: 'socket' | 'http'
   botToken?: string
@@ -120,12 +120,12 @@ export interface SlackChannelConfig {
   appToken?: string
 }
 
-/** 向导用 WhatsApp 配置（与原生 WhatsAppConfig 对齐，Baileys 需 Control UI 配置） */
+/** Wizard WhatsApp channel (aligned with upstream; Baileys needs Control UI) */
 export interface WhatsAppChannelConfig {
   enabled?: boolean
 }
 
-/** 通道配置（按通道名索引） */
+/** Channels keyed by channel name */
 export interface ChannelsConfig {
   feishu?: FeishuChannelConfig
   telegram?: TelegramChannelConfig
@@ -135,7 +135,7 @@ export interface ChannelsConfig {
   [key: string]: unknown
 }
 
-/** OpenClaw 主配置，存储在 %USERPROFILE%\.openclaw\openclaw.json */
+/** Main OpenClaw config at %USERPROFILE%\.openclaw\openclaw.json */
 export interface OpenClawConfig {
   gateway?: GatewayConfig
   agents?: AgentsConfig
@@ -145,21 +145,21 @@ export interface OpenClawConfig {
   [key: string]: unknown
 }
 
-/** 自定义/扩展模型 Provider 配置 */
+/** Custom / extended model provider entry */
 export interface ModelProviderConfig {
   baseUrl?: string
   compatibility?: 'openai' | 'anthropic'
-  /** OpenClaw 原生字段：模型 API 类型 */
+  /** Upstream field: model API kind */
   api?: string
   apiKey?: string
-  /** 自定义 HTTP 头 */
+  /** Custom HTTP headers */
   headers?: Record<string, string>
-  /** 是否发送 Authorization 头（copilot-proxy 等本地代理为 false） */
+  /** Whether to send Authorization (false for local proxies like copilot-proxy) */
   authHeader?: boolean
   models?: Array<Record<string, unknown> & { id: string; name?: string }>
 }
 
-/** Models 配置（与 CLI 结构对齐） */
+/** Models section (CLI-aligned) */
 export interface ModelsConfig {
   mode?: 'merge' | 'replace'
   providers?: Record<string, ModelProviderConfig>
@@ -167,7 +167,7 @@ export interface ModelsConfig {
 
 // ─── WizardState ─────────────────────────────────────────────────────────────
 
-/** 模型提供商 */
+/** Model provider id */
 export type ModelProvider =
   | 'anthropic'
   | 'openai'
@@ -210,21 +210,21 @@ export type ModelProvider =
   | 'kimi-coding'
   | 'chutes'
   | 'copilot-proxy'
-  | 'kuae' // 夸娥云编程套餐 (Kuae Cloud Coding Plan)
+  | 'kuae' // Kuae Cloud Coding Plan
   | 'custom'
 
-/** 向导中的模型配置 */
+/** Wizard model step data */
 export interface ModelConfig {
   provider: ModelProvider
   apiKey: string
   modelId: string
   /** Moonshot endpoint region */
   moonshotRegion?: 'global' | 'cn'
-  /** 自定义 Provider: 真实 provider id */
+  /** Custom provider: real provider id */
   customProviderId?: string
-  /** 自定义 Provider: API Base URL */
+  /** Custom provider: API base URL */
   customBaseUrl?: string
-  /** 自定义 Provider: 兼容协议 */
+  /** Custom provider: protocol compatibility */
   customCompatibility?: 'openai' | 'anthropic'
   /** Cloudflare AI Gateway: Account ID */
   cloudflareAccountId?: string
@@ -232,7 +232,7 @@ export interface ModelConfig {
   cloudflareGatewayId?: string
 }
 
-/** 向导中的通道配置 */
+/** Wizard channel step data */
 export interface ChannelConfig {
   feishu: FeishuChannelConfig | null
   telegram: TelegramChannelConfig | null
@@ -243,14 +243,14 @@ export interface ChannelConfig {
   skipChannels: boolean
 }
 
-/** 向导中的 Gateway 配置 */
+/** Wizard gateway step data */
 export interface GatewayWizardConfig {
   port: number
   bind: 'loopback' | 'lan' | 'auto'
   authToken: string
 }
 
-/** 向导进度状态（内存态），由 Zustand store 管理 */
+/** Wizard progress (in-memory, Zustand) */
 export interface WizardState {
   currentStep: number
   modelConfig: ModelConfig
@@ -260,7 +260,7 @@ export interface WizardState {
 
 // ─── WizardCompleteResult ─────────────────────────────────────────────────────
 
-/** 向导 completeSetup 结果 */
+/** Result of wizard completeSetup */
 export interface WizardCompleteResult {
   ok: boolean
   port?: number
@@ -270,13 +270,13 @@ export interface WizardCompleteResult {
 
 // ─── BundleManifest / AppVersionInfo ────────────────────────────────────────
 
-/** Bundle manifest（prepare-bundle 写入，供 About/Update Center 展示） */
+/** Bundle manifest from prepare-bundle (About / Update Center) */
 export interface BundleManifest {
   shellVersion: string
   bundledOpenClawVersion: string
 }
 
-/** 应用版本信息，由主进程收集 */
+/** Collected app version info */
 export interface AppVersionInfo {
   shell: string
   electron: string
@@ -286,10 +286,10 @@ export interface AppVersionInfo {
 
 // ─── GatewayStatus ───────────────────────────────────────────────────────────
 
-/** Gateway 状态枚举 */
+/** Gateway lifecycle status */
 export type GatewayStatusValue = 'starting' | 'running' | 'stopped' | 'error'
 
-/** Gateway 子进程运行状态 */
+/** Gateway child process snapshot */
 export interface GatewayStatus {
   running: boolean
   port: number
@@ -300,13 +300,13 @@ export interface GatewayStatus {
 
 // ─── Registry (Skills / Extensions / Commands) ──────────────────────────────
 
-/** Skill 来源 */
+/** Skill discovery source */
 export type SkillSource = 'bundled' | 'user-workspace' | 'user-extensions' | 'load-path'
 
-/** Extension 来源 */
+/** Extension discovery source */
 export type ExtensionSource = 'bundled' | 'user-extensions' | 'load-path'
 
-/** Skill 注册表项 */
+/** Skill registry row */
 export interface SkillRegistryItem {
   id: string
   name: string
@@ -319,7 +319,7 @@ export interface SkillRegistryItem {
   conflict?: string
 }
 
-/** Extension 注册表项 */
+/** Extension registry row */
 export interface ExtensionRegistryItem {
   id: string
   name: string
@@ -334,7 +334,7 @@ export interface ExtensionRegistryItem {
   error?: string
 }
 
-/** 插件信息（来自 openclaw plugins list --json） */
+/** Plugin row from `openclaw plugins list --json` */
 export interface PluginInfo {
   id: string
   name?: string
@@ -346,14 +346,14 @@ export interface PluginInfo {
   error?: string
 }
 
-/** 校验结果 */
+/** Validation outcome */
 export interface ValidationResult {
   ok: boolean
   errors?: string[]
   warnings?: string[]
 }
 
-/** 导出摘要 */
+/** Registry export summary */
 export interface RegistryExportSummary {
   skills: string[]
   extensions: string[]
@@ -362,7 +362,7 @@ export interface RegistryExportSummary {
 
 // ─── Update / Verify / Repair ────────────────────────────────────────────────
 
-/** GitHub Release 版本信息 */
+/** GitHub release check result */
 export interface UpdateCheckResult {
   hasUpdate: boolean
   currentVersion: string
@@ -374,7 +374,7 @@ export interface UpdateCheckResult {
   error?: string
 }
 
-/** Bundle 校验结果 */
+/** Bundled resources verification */
 export interface BundleVerifyResult {
   ok: boolean
   nodeExists: boolean
@@ -388,7 +388,7 @@ export interface BundleVerifyResult {
   }
 }
 
-/** 预启动检查结果（前端可消费） */
+/** Pre-start check payload for the renderer */
 export interface PrestartCheckFrontend {
   ok: boolean
   bundleOk: boolean
@@ -398,7 +398,7 @@ export interface PrestartCheckFrontend {
   fixSuggestions: string[]
 }
 
-/** 安装后校验结果（供 Update Center 展示回滚指引） */
+/** Post-update validation (rollback hints for Update Center) */
 export interface PostUpdateValidationResult {
   ran: boolean
   ok: boolean
@@ -406,12 +406,12 @@ export interface PostUpdateValidationResult {
   rollbackGuidance: string
 }
 
-// ─── Diagnostics (Doctor 代理) ────────────────────────────────────────────────
+// ─── Diagnostics (Doctor proxy) ────────────────────────────────────────────────
 
-/** 诊断项级别 */
+/** Diagnostic severity */
 export type DiagnosticLevel = 'error' | 'warning' | 'info' | 'pass'
 
-/** 诊断项 */
+/** Single diagnostic line */
 export interface DiagnosticItem {
   id: string
   level: DiagnosticLevel
@@ -420,7 +420,7 @@ export interface DiagnosticItem {
   source?: 'cli' | 'prestart' | 'desktop'
 }
 
-/** 诊断报告 */
+/** Full diagnostic report */
 export interface DiagnosticReport {
   ok: boolean
   items: DiagnosticItem[]

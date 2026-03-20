@@ -10,9 +10,9 @@ import { logInfo, logWarn } from '../utils/logger.js'
 export interface GatewayLaunchOptions {
   port?: number
   bind?: 'loopback' | 'lan' | 'auto'
-  /** 认证 token，传递 --token 和 --auth token 与原生 gateway run 对齐 */
+  /** Auth token; passed as --token / --auth token (aligned with gateway run) */
   token?: string
-  /** 端口冲突时传递 --force，由用户配置 gateway.forcePortOnConflict 控制 */
+  /** Pass --force on port conflict when gateway.forcePortOnConflict is set */
   force?: boolean
 }
 
@@ -44,9 +44,10 @@ export interface GatewayHealthCheckResult {
 }
 
 /**
- * Kuae Coding Plan（OpenAI 兼容）API 主机。部分本机 HTTPS 代理（如 127.0.0.1:10808）对该域名 TLS 握手异常，
- * 而直连正常。将下列主机并入网关子进程的 NO_PROXY，使 LLM 请求直连 Kuae，其余流量仍可走系统代理。
- * 设置 OPENCLAW_SKIP_KUAE_NO_PROXY=1 可禁用此合并（调试用）。
+ * Kuae Coding Plan (OpenAI-compatible) API hosts. Some local HTTPS proxies break TLS to these
+ * hosts while direct connections work. Merge the following into the gateway child NO_PROXY so
+ * Kuae LLM traffic bypasses the proxy; other traffic still follows HTTP(S)_PROXY.
+ * Set OPENCLAW_SKIP_KUAE_NO_PROXY=1 to disable (debugging).
  */
 const KUAE_DIRECT_NO_PROXY_HOSTS = ['coding-plan-endpoint.kuaecloud.net', '.kuaecloud.net'] as const
 
@@ -62,9 +63,7 @@ function mergeNoProxyList(existing: string | undefined, additions: readonly stri
   return [...parts].join(',')
 }
 
-/**
- * 在保留 HTTPS_PROXY 等的前提下，为 Kuae API 追加 NO_PROXY / no_proxy（Node fetch/undici 会读取）。
- */
+/** Append Kuae hosts to NO_PROXY / no_proxy while keeping HTTPS_PROXY etc. (Node fetch/undici). */
 function applyKuaeNoProxyBypass(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   if (env.OPENCLAW_SKIP_KUAE_NO_PROXY === '1' || env.OPENCLAW_SKIP_KUAE_NO_PROXY === 'true') {
     return env
@@ -382,8 +381,7 @@ export class GatewayProcessManager {
   }
 
   /**
-   * 等待 Gateway 真正开始监听（GET /health 返回 200）后再将状态设为 running，
-   * 与 OpenClaw 官方行为一致：仅当端口可访问时才视为就绪。
+   * Wait until GET /health returns 200 before marking running — matches upstream: ready only when reachable.
    */
   private async waitForGatewayReady(): Promise<void> {
     this.waitForReadyAbort?.abort()

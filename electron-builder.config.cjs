@@ -1,10 +1,10 @@
 /**
- * electron-builder 配置（支持条件签名）
- * - 未设置 CSC_LINK 时：不签名，适合本地/内测
- * - 设置 CSC_LINK + CSC_KEY_PASSWORD 时：自动代码签名
- * 使用:
- *   pnpm run package:win         - 构建（有证书则签名）
- *   pnpm run package:win:signed  - 必须签名，否则失败（会加载 .env）
+ * electron-builder config (optional code signing).
+ * - No CSC_LINK → unsigned (fine for local builds)
+ * - CSC_LINK + CSC_KEY_PASSWORD → sign automatically
+ * Commands:
+ *   pnpm run package:win         — build (signs if cert present)
+ *   pnpm run package:win:signed — require signing (loads .env)
  */
 const fs = require('node:fs')
 const path = require('node:path')
@@ -88,7 +88,7 @@ module.exports = {
 
   asar: true,
   compression: 'normal',
-  // 解包 renderer/preload，避免 asar 内 file:// 在 Windows 下导致白屏（相对路径解析失败）
+  // Unpack renderer/preload so file:// resolves assets on Windows (avoid blank screen)
   asarUnpack: ['out/renderer/**', 'out/preload/**'],
 
   extraResources: [
@@ -129,13 +129,13 @@ module.exports = {
     target: [{ target: 'nsis', arch: ['x64'] }],
     icon: iconIcoPath,
     artifactName: 'OpenClaw-Setup-${version}.${ext}',
-    // 必须为 true 才能将 icon 嵌入 exe；false 时 electron-builder 会跳过 rcedit 步骤（不下载 winCodeSign），图标不生效
-    // 无 CSC_LINK 时仅执行 edit（嵌入图标），不执行签名
-    // 设置 SKIP_EXE_RESOURCE_EDIT=1 可跳过（用于 GitHub/镜像均不可达时的本地构建）
+    // true = rcedit embeds icon; false skips rcedit (no winCodeSign fetch) — icon missing
+    // Without CSC_LINK only resource edit runs, not signing
+    // SKIP_EXE_RESOURCE_EDIT=1 skips edit when mirrors are unreachable
     signAndEditExecutable: process.env.SKIP_EXE_RESOURCE_EDIT !== '1',
-    // 代码签名：设置 CSC_LINK + CSC_KEY_PASSWORD（或 WIN_CSC_LINK + WIN_CSC_KEY_PASSWORD）时自动签名
-    forceCodeSigning: false, // 无证书时仍可构建，适合本地/内测
-    // 额外签名 exe/dll（如 node.exe 与相关 DLL），仅在有证书时生效
+    // Signing: CSC_LINK + CSC_KEY_PASSWORD (or WIN_* variants)
+    forceCodeSigning: false, // Allow unsigned builds without a cert
+    // Also sign bundled exe/dll when a cert is configured
     signExts: ['exe', 'dll'],
   },
 
@@ -156,7 +156,7 @@ module.exports = {
     shortcutName: 'OpenClaw Desktop',
     runAfterFinish: true,
     deleteAppDataOnUninstall: false,
-    // 必须存在仓库中的 build/installer.nsh（已用 .gitignore 例外跟踪）；勿删，否则 NSIS 打包会失败
+    // Repo must ship build/installer.nsh (.gitignore exception) — NSIS fails if missing
     include: 'build/installer.nsh',
   },
 

@@ -165,7 +165,7 @@ async function generateInstallerSidebar() {
 }
 
 function verify() {
-  console.log('\n验证结果:');
+  console.log('\nVerification:');
   const checks = [
     { name: 'icon.ico', path: join(RESOURCES_DIR, 'icon.ico') },
     { name: 'tray-icon.png', path: join(RESOURCES_DIR, 'tray-icon.png') },
@@ -175,13 +175,13 @@ function verify() {
   let ok = true;
   for (const { name, path } of checks) {
     if (!existsSync(path)) {
-      console.log(`  ✗ ${name}: 文件不存在`);
+      console.log(`  ✗ ${name}: missing`);
       ok = false;
       continue;
     }
     const size = statSync(path).size;
     if (size === 0) {
-      console.log(`  ✗ ${name}: 文件为空`);
+      console.log(`  ✗ ${name}: empty file`);
       ok = false;
       continue;
     }
@@ -194,18 +194,18 @@ async function main() {
   await mkdir(RESOURCES_DIR, { recursive: true });
   await mkdir(INSTALLER_DIR, { recursive: true });
 
-  console.log('生成 OpenClaw 品牌资源文件...\n');
+  console.log('Generating OpenClaw brand assets...\n');
   await generateIconIco();
   await generateTrayIcon();
   await generateInstallerSidebar();
 
-  console.log('\n图像文件生成完成。');
+  console.log('\nImage assets done.');
 
   const ok = verify();
   process.exit(ok ? 0 : 1);
 }
 
 main().catch(err => {
-  console.error('生成失败:', err);
+  console.error('Generation failed:', err);
   process.exit(1);
 });

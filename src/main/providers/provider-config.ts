@@ -1,6 +1,5 @@
 /**
- * Provider 配置管理 — models.providers、agents.defaults、auth.order
- * 与 openclaw-config 协同，供 LLM API 管理 UI 使用
+ * models.providers, agents.defaults, auth.order — shared with LLM API UI.
  */
 
 import type {
@@ -41,7 +40,7 @@ function getProviderSummary(providerId: string, config: ModelProviderConfig): Pr
 }
 
 /**
- * 获取 Provider 与模型默认值摘要（用于 UI 展示，不含明文 key）
+ * Summary for UI (no raw secrets)
  */
 export function getProvidersSummary(
   config: OpenClawConfig,
@@ -79,7 +78,7 @@ export function getProvidersSummary(
 }
 
 /**
- * 保存单个 provider 配置到 models.providers
+ * Save one models.providers entry
  */
 export function saveProviderConfig(
   currentConfig: OpenClawConfig,
@@ -95,7 +94,7 @@ export function saveProviderConfig(
 }
 
 /**
- * 设置模型默认值与 fallback 链
+ * Set default model + fallbacks
  */
 export function setModelDefaults(
   currentConfig: OpenClawConfig,
@@ -120,15 +119,14 @@ export function setModelDefaults(
   return next
 }
 
-/** 扩展类型以支持 fallbacks */
+/** Widen type for fallbacks */
 interface AgentModelDefaultsExt {
   primary?: string
   fallbacks?: string[]
 }
 
 /**
- * 设置模型别名（agents.defaults.models）
- * 与 OpenClaw models aliases 对齐
+ * Set model aliases (agents.defaults.models)
  */
 export function setModelAliases(
   currentConfig: OpenClawConfig,
@@ -142,7 +140,7 @@ export function setModelAliases(
 }
 
 /**
- * 更新 auth.order 中某 provider 的 profile 顺序
+ * Reorder profiles in auth.order[provider]
  */
 export function updateAuthOrder(
   currentConfig: OpenClawConfig,
@@ -157,7 +155,7 @@ export function updateAuthOrder(
 }
 
 /**
- * 将 profileId 加入 auth.order[providerId]，若不存在则插入首位
+ * Ensure profileId is first in auth.order[providerId]
  */
 export function addProfileToAuthOrder(
   currentConfig: OpenClawConfig,
@@ -171,7 +169,7 @@ export function addProfileToAuthOrder(
 }
 
 /**
- * 从 auth.order[providerId] 移除 profileId
+ * Remove profileId from auth.order[providerId]
  */
 export function removeProfileFromAuthOrder(
   currentConfig: OpenClawConfig,

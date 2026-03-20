@@ -1,8 +1,7 @@
 /**
- * 开机自启 — 与 ShellConfig.autoStart 联动
- * 使用 Electron app.setLoginItemSettings / getLoginItemSettings
- * Windows: 注册表 HKCU\...\Run
- * macOS: Launch Agent
+ * Auto-start at login — tied to ShellConfig.autoStart.
+ * Electron setLoginItemSettings / getLoginItemSettings.
+ * Windows: HKCU ... Run; macOS: Launch Agent.
  */
 
 import { app } from 'electron'
@@ -15,7 +14,7 @@ function isSupported(): boolean {
 }
 
 /**
- * 将 autoStart 配置同步到系统登录项
+ * Apply ShellConfig.autoStart to the OS login item
  */
 export function syncLoginItemToSystem(autoStart: boolean): void {
   if (!isSupported()) {
@@ -32,7 +31,7 @@ export function syncLoginItemToSystem(autoStart: boolean): void {
 }
 
 /**
- * 获取当前系统登录项状态（openAtLogin）
+ * Read whether the app is set to open at login
  */
 export function getLoginItemOpenAtLogin(): boolean {
   if (!isSupported()) {
@@ -50,7 +49,7 @@ export function getLoginItemOpenAtLogin(): boolean {
 }
 
 /**
- * 清除登录项（供卸载脚本或 --clear-login-item 调用）
+ * Remove login item (uninstaller or --clear-login-item)
  */
 export function clearLoginItem(): void {
   if (!isSupported()) {

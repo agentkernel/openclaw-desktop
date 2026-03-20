@@ -1,6 +1,6 @@
 /**
- * electron-updater 集成 — 检查、下载、安装生命周期
- * 支持 stable/beta 通道，开发模式下 graceful 降级
+ * electron-updater wiring: check / download / install.
+ * stable/beta channel; dev mode skips updater gracefully.
  */
 
 import { app } from 'electron'
@@ -14,8 +14,7 @@ let sendToRenderer: SendToRenderer = () => {}
 let currentCancellationToken: CancellationToken | null = null
 
 /**
- * 初始化 autoUpdater，绑定事件并推送到 Renderer
- * 仅在打包应用时启用；开发模式跳过
+ * Init autoUpdater and forward events to renderer (packaged only; dev skips)
  */
 type ReadShellConfig = () => { updateChannel?: string }
 
@@ -69,8 +68,7 @@ export function initAutoUpdater(
 }
 
 /**
- * 使用 autoUpdater 检查更新
- * 仅在打包应用时使用；否则返回 null 表示需降级
+ * Check via autoUpdater; null in dev (caller falls back)
  */
 export async function checkForUpdatesWithAutoUpdater(
   readShellConfig: ReadShellConfig,
@@ -109,8 +107,7 @@ export async function checkForUpdatesWithAutoUpdater(
 }
 
 /**
- * 下载更新
- * 进度通过 IPC_UPDATE_PROGRESS 推送；完成时 promise resolve
+ * Download update; progress on IPC_UPDATE_PROGRESS; resolves when done
  */
 export async function downloadShellUpdate(): Promise<void> {
   if (!app.isPackaged) {
@@ -128,7 +125,7 @@ export async function downloadShellUpdate(): Promise<void> {
 }
 
 /**
- * 取消当前下载
+ * Cancel active download
  */
 export function cancelShellDownload(): void {
   if (currentCancellationToken) {
@@ -138,8 +135,7 @@ export function cancelShellDownload(): void {
 }
 
 /**
- * 执行安装（由 installShellUpdateWithBackup 在备份后调用）
- * 安装会立即退出应用，调用后不会返回
+ * Quit and install (after backup). Does not return — process exits.
  */
 export function quitAndInstallShell(): void {
   if (!app.isPackaged) {

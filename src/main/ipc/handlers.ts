@@ -128,7 +128,7 @@ export interface IpcHandlerDeps {
   getBundledOpenClawPath?: () => string
   getVersions: () => AppVersionInfo
   resizeMainWindow?: (width: number, height: number, center?: boolean) => void
-  /** 进入主界面时强制调整窗口大小（不受当前尺寸限制） */
+  /** Resize window for main shell (may grow beyond current size) */
   resizeForMainInterface?: () => void
 }
 
@@ -399,7 +399,7 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
-  // ─── Provider / Auth Profile 管理 ─────────────────────────────────────────
+  // ─── Provider / auth profile ───────────────────────────────────────────────
   ipcMain.handle(
     IPC_PROVIDERS_LIST,
     wrapHandler('PROVIDERS_LIST', () => {
@@ -623,7 +623,7 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
-  // ─── Models 代理 ─────────────────────────────────────────────────────────
+  // ─── Models (RPC proxy) ────────────────────────────────────────────────────
   ipcMain.handle(
     IPC_MODELS_LIST,
     wrapHandler('MODELS_LIST', async () => {
@@ -679,7 +679,7 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
-  // ─── Plugins 代理 ─────────────────────────────────────────────────────────
+  // ─── Plugins (CLI proxy) ───────────────────────────────────────────────────
   ipcMain.handle(
     IPC_PLUGINS_LIST,
     wrapHandler('PLUGINS_LIST', () => listPluginsWithCli()),
@@ -758,7 +758,7 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
-  // ─── Backup 代理 ───────────────────────────────────────────────────────
+  // ─── Backup (CLI proxy) ────────────────────────────────────────────────────
   ipcMain.handle(
     IPC_BACKUP_CREATE,
     wrapHandler('BACKUP_CREATE', async (opts?: unknown) => {
@@ -785,7 +785,7 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
-  // ─── Logs 代理 ─────────────────────────────────────────────────────────
+  // ─── Logs (RPC proxy) ──────────────────────────────────────────────────────
   ipcMain.handle(
     IPC_LOGS_TAIL,
     wrapHandler('LOGS_TAIL', async (opts: unknown) => {

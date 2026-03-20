@@ -1,6 +1,6 @@
 /**
- * Preload 脚本 — contextBridge.exposeInMainWorld API
- * 与 ipc-channels.ts 定义一致，contextIsolation: true 且 nodeIntegration: false
+ * Preload: contextBridge.exposeInMainWorld API surface.
+ * Matches ipc-channels; contextIsolation on, nodeIntegration off.
  */
 
 import { contextBridge, ipcRenderer } from 'electron'
@@ -105,7 +105,7 @@ const on = (
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // ─── 请求-响应通道 ───────────────────────────────────────────────────────
+  // ─── Invoke channels ───────────────────────────────────────────────────────
   gatewayStart: () => invoke(IPC_GATEWAY_START),
   gatewayStop: () => invoke(IPC_GATEWAY_STOP),
   gatewayRestart: () => invoke(IPC_GATEWAY_RESTART),
@@ -202,7 +202,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   backupVerify: (archivePath: string) =>
     invoke<{ ok: boolean; archivePath?: string; message?: string }>(IPC_BACKUP_VERIFY, archivePath),
 
-  // ─── 事件订阅通道 ───────────────────────────────────────────────────────
+  // ─── Event subscriptions ─────────────────────────────────────────────────────
   onGatewayStatusChange: (callback: (status: unknown) => void) =>
     on(IPC_GATEWAY_STATUS_CHANGE, callback),
   onGatewayLog: (callback: (log: unknown) => void) =>

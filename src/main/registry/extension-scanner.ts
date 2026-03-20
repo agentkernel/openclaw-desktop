@@ -1,6 +1,5 @@
 /**
- * Extension / Plugin 目录扫描 — 识别 openclaw.plugin.json 并解析元数据
- * 与 OpenClaw 原生 plugins 发现逻辑对齐（轻量实现）
+ * Scan extension dirs for openclaw.plugin.json (lightweight upstream-style discovery).
  */
 
 import fs from 'node:fs'
@@ -97,7 +96,7 @@ export interface ScanExtensionsOptions {
 }
 
 /**
- * 扫描 extensions 目录，合并 bundled、用户 extensions、load.paths
+ * Merge bundled, user extensions, and load.paths
  */
 export function scanExtensions(opts: ScanExtensionsOptions): ExtensionRegistryItem[] {
   const config = opts.readOpenClawConfig()

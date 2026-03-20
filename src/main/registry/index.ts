@@ -1,6 +1,5 @@
 /**
- * Registry 模块 — Skills / Extensions / Slash Commands 注册表
- * 导出扫描、配置写入、导入导出能力
+ * Registry: skills / extensions / slash commands — scan, persist toggles, import/export.
  */
 
 export { scanSkills } from './skill-scanner.js'

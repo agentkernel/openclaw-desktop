@@ -7,7 +7,7 @@ import { formatMainVersion } from '@/utils/version-format'
 const PROJECT_URL = 'https://github.com/agentkernel/openclaw-desktop'
 
 export interface AboutViewProps {
-  /** 嵌入模式时由父组件提供的返回回调 */
+  /** Back navigation when embedded in parent layout */
   onBack?: () => void
 }
 

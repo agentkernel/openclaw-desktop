@@ -1,6 +1,6 @@
 /**
- * Backup/Restore 代理 — 通过 bundled node.exe 执行 openclaw backup create/verify
- * 兼容原生 backup 格式，返回文件路径和资产列表
+ * Backup/restore via bundled node: `openclaw backup create` / `verify`.
+ * Output shape matches upstream CLI.
  */
 
 import { spawn } from 'node:child_process'
@@ -120,7 +120,7 @@ function parseJsonFromStdout(stdout: string): unknown {
 }
 
 /**
- * 执行 openclaw backup create，返回备份文件路径和资产列表
+ * Run `openclaw backup create`; returns archive path and asset list
  */
 export async function runBackupCreateCli(opts: BackupCreateOptions = {}): Promise<BackupCreateResult> {
   const args: string[] = ['create', '--json']
@@ -173,7 +173,7 @@ export async function runBackupCreateCli(opts: BackupCreateOptions = {}): Promis
 }
 
 /**
- * 执行 openclaw backup verify，校验备份完整性
+ * Run `openclaw backup verify`
  */
 export async function runBackupVerifyCli(archivePath: string): Promise<BackupVerifyResult> {
   const resolved = path.resolve(archivePath)

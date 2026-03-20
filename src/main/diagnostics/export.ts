@@ -1,5 +1,5 @@
 /**
- * 诊断包导出 — 聚合版本、配置摘要、最近日志、校验结果，脱敏后写入 JSON
+ * Export diagnostics bundle: versions, config summary, recent logs, checks — redacted JSON.
  */
 
 import crypto from 'node:crypto'
@@ -19,7 +19,7 @@ export interface DiagnosticsExportInput {
   openclawConfig: OpenClawConfig
   shellConfig: ShellConfig
   prestartCheck: PrestartCheckResult
-  /** Doctor 诊断结果（可选，由 IPC handler 异步获取后传入） */
+  /** Optional doctor payload (filled async by IPC handler) */
   doctorReport?: DiagnosticReport
 }
 

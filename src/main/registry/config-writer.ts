@@ -1,6 +1,4 @@
-/**
- * 配置写入 — Skills/Extensions 启用/禁用写入 openclaw.json
- */
+/** Persist skill/extension enable flags into openclaw.json */
 
 import type { OpenClawConfig } from '../../shared/types.js'
 
@@ -10,7 +8,7 @@ export interface ConfigWriterDeps {
 }
 
 /**
- * 切换 Skill 启用状态
+ * Toggle skill enabled
  */
 export function toggleSkill(
   deps: ConfigWriterDeps,
@@ -30,7 +28,7 @@ export function toggleSkill(
 }
 
 /**
- * 切换 Extension/Plugin 启用状态
+ * Toggle extension/plugin enabled
  */
 export function toggleExtension(
   deps: ConfigWriterDeps,

@@ -1,6 +1,5 @@
 /**
- * ElectronAPI 类型定义 — Renderer 通过 window.electronAPI 调用
- * 与 Preload 暴露的 API 签名一致
+ * `window.electronAPI` typings — must match preload exposure.
  */
 
 import type {
@@ -25,30 +24,30 @@ import type {
   DiagnosticItem,
 } from './types'
 
-/** 端口检测结果 */
+/** TCP port check result */
 export interface PortCheckResult {
   available: boolean
   pid?: number
 }
 
-/** Gateway 启动/重启结果 */
+/** Gateway start/restart result */
 export interface GatewayStartResult {
   port: number
 }
 
-/** 模型测试结果 */
+/** Wizard / provider model test result */
 export interface WizardTestModelResult {
   ok: boolean
   message?: string
 }
 
-/** Gateway 日志输出 */
+/** Gateway log line */
 export interface GatewayLogPayload {
   level: string
   message: string
 }
 
-/** 结构化日志（stream:gateway-logs） */
+/** Structured gateway log (`stream:gateway-logs`) */
 export interface StructuredLogPayload {
   timestamp: string
   level: 'info' | 'warn' | 'error'
@@ -56,7 +55,7 @@ export interface StructuredLogPayload {
   message: string
 }
 
-/** 备份创建结果 */
+/** Backup archive create result */
 export interface BackupCreateResult {
   archivePath: string
   assets: Array<{ kind: string; displayPath: string }>
@@ -64,21 +63,21 @@ export interface BackupCreateResult {
   verified?: boolean
 }
 
-/** 配置校验结果（openclaw config validate --json） */
+/** `openclaw config validate --json` result */
 export interface ConfigValidationResult {
   valid: boolean
   configPath: string
   issues: Array<{ path: string; message: string; allowedValues?: string[] }>
 }
 
-/** 备份校验结果 */
+/** Backup verify result */
 export interface BackupVerifyResult {
   ok: boolean
   archivePath?: string
   message?: string
 }
 
-/** logs.tail 响应 */
+/** `logs.tail` RPC response */
 export interface LogsTailResult {
   file?: string
   cursor?: number
@@ -88,12 +87,12 @@ export interface LogsTailResult {
   reset?: boolean
 }
 
-/** 更新可用 */
+/** Update-available push payload */
 export interface UpdateAvailablePayload {
   version: string
 }
 
-/** 更新进度 */
+/** Update download progress */
 export interface UpdateProgressPayload {
   percent: number
   bytesPerSecond?: number
@@ -103,7 +102,7 @@ export interface UpdateProgressPayload {
   error?: string
 }
 
-/** Provider 管理列表结果 */
+/** LLM providers + profiles list */
 export interface ProvidersListResult {
   profiles: Array<{ profileId: string; provider: string; hasKey: boolean }>
   providers: Array<{
@@ -117,12 +116,12 @@ export interface ProvidersListResult {
   authOrder: Record<string, string[]>
 }
 
-/** 取消订阅函数 */
+/** IPC event unsubscribe handle */
 export type Unsubscribe = () => void
 
-/** Preload 暴露的 electronAPI 接口 */
+/** Preload `electronAPI` surface */
 export interface ElectronAPI {
-  // ─── 请求-响应通道 ───────────────────────────────────────────────────────
+  // ─── Invoke channels ───────────────────────────────────────────────────────
   gatewayStart: () => Promise<GatewayStartResult>
   gatewayStop: () => Promise<void>
   gatewayRestart: () => Promise<GatewayStartResult>
@@ -188,7 +187,7 @@ export interface ElectronAPI {
   backupCreate: (opts?: { output?: string; includeWorkspace?: boolean; onlyConfig?: boolean; verify?: boolean }) => Promise<BackupCreateResult>
   backupVerify: (archivePath: string) => Promise<BackupVerifyResult>
 
-  // ─── 事件订阅通道 ───────────────────────────────────────────────────────
+  // ─── Event subscriptions ───────────────────────────────────────────────────
   onGatewayStatusChange: (callback: (status: GatewayStatus) => void) => Unsubscribe
   onGatewayLog: (callback: (log: GatewayLogPayload) => void) => Unsubscribe
   onStreamGatewayLogs: (callback: (log: StructuredLogPayload) => void) => Unsubscribe

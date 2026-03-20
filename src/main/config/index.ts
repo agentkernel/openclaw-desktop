@@ -1,6 +1,4 @@
-/**
- * 配置管理器 — 统一导出
- */
+/** Config module re-exports */
 
 export {
   readOpenClawConfig,

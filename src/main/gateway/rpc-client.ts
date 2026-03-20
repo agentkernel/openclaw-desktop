@@ -1,6 +1,5 @@
 /**
- * Gateway RPC 客户端 — 通过 WebSocket 调用 Gateway RPC 方法
- * 与 OpenClaw Gateway 协议兼容（WebSocket，非 HTTP）
+ * Gateway RPC client over WebSocket (not HTTP), compatible with upstream gateway protocol.
  */
 
 import { randomUUID } from 'node:crypto'
@@ -12,7 +11,7 @@ const PROTOCOL_VERSION = 3
 const CLIENT_ID = 'openclaw-desktop'
 const CLIENT_VERSION = '0.1.2'
 
-// ─── 错误类型 ─────────────────────────────────────────────────────────────
+// ─── Errors ────────────────────────────────────────────────────────────────
 
 export class GatewayRpcError extends Error {
   constructor(
@@ -33,7 +32,7 @@ export type GatewayRpcErrorCode =
   | 'GATEWAY_RPC_ERROR'
   | 'GATEWAY_NOT_CONNECTED'
 
-// ─── 选项与配置 ───────────────────────────────────────────────────────────
+// ─── Options ─────────────────────────────────────────────────────────────────
 
 export interface GatewayRpcClientOptions {
   port: number
@@ -42,7 +41,7 @@ export interface GatewayRpcClientOptions {
   maxRetries?: number
 }
 
-// ─── 内部协议类型（与 OpenClaw Gateway 协议对齐）────────────────────────────
+// ─── Wire frames (upstream gateway protocol) ─────────────────────────────────
 
 interface RequestFrame {
   type: 'req'
@@ -95,9 +94,7 @@ export class GatewayRpcClient {
     this.maxRetries = Math.max(0, options.maxRetries ?? 3)
   }
 
-  /**
-   * 建立 WebSocket 连接并完成 connect 握手
-   */
+  /** Open WebSocket and finish connect handshake */
   async connect(): Promise<void> {
     if (this.closed) {
       throw new GatewayRpcError('client closed', 'GATEWAY_NOT_CONNECTED')
@@ -263,9 +260,7 @@ export class GatewayRpcClient {
     }
   }
 
-  /**
-   * 发送 RPC 请求，等待响应
-   */
+  /** Send RPC request and await response */
   async request<T = unknown>(
     method: string,
     params?: unknown,
@@ -304,9 +299,7 @@ export class GatewayRpcClient {
     })
   }
 
-  /**
-   * Streaming 模式占位：当前委托给 request，若有 onChunk 则回调 payload 一次
-   */
+  /** Streaming stub: delegates to request; invokes onChunk once if provided */
   async stream(
     method: string,
     params?: unknown,
@@ -339,12 +332,10 @@ function mapErrorCode(code?: string): GatewayRpcErrorCode {
   return 'GATEWAY_RPC_ERROR'
 }
 
-// ─── 工厂函数 ─────────────────────────────────────────────────────────────
+// ─── Factory ─────────────────────────────────────────────────────────────────
 
 /**
- * 从 ShellConfig + OpenClawConfig 创建 GatewayRpcClient
- * port: shellConfig.lastGatewayPort
- * token: openclawConfig.gateway?.auth?.token
+ * Build client from shell + OpenClaw config (port from lastGatewayPort, token from gateway.auth).
  */
 export async function createGatewayRpcClientFromConfig(
   overrides?: Partial<GatewayRpcClientOptions>

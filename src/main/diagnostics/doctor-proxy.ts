@@ -1,6 +1,6 @@
 /**
- * Doctor 诊断代理 — 通过 bundled node.exe 执行 openclaw doctor，解析为结构化报告
- * 补充桌面版专属检查：bundle 完整性、Shell 配置一致性、Gateway 状态
+ * Doctor proxy: run bundled `openclaw doctor`, parse stdout into items.
+ * Adds desktop checks: bundle, shell/config port consistency, gateway status.
  */
 
 import { spawn } from 'node:child_process'
@@ -22,9 +22,7 @@ function withNodeInPath(env: NodeJS.ProcessEnv, nodePath: string): NodeJS.Proces
   }
 }
 
-/**
- * 执行 openclaw doctor --non-interactive，返回原始输出
- */
+/** Run `openclaw doctor --non-interactive`; raw stdout/stderr */
 async function runDoctorCli(): Promise<{ exitCode: number; stdout: string; stderr: string }> {
   const nodePath = getBundledNodePath()
   const openclawPath = getBundledOpenClawPath()
@@ -76,15 +74,15 @@ async function runDoctorCli(): Promise<{ exitCode: number; stdout: string; stder
 }
 
 /**
- * 从 doctor stdout 解析 note 格式，提取 DiagnosticItem
- * OpenClaw note 格式示例: "Gateway\n  token missing..."
+ * Parse doctor note-style output into DiagnosticItem rows.
+ * Example: "Gateway\n  token missing..."
  */
 function parseDoctorOutput(stdout: string, stderr: string): DiagnosticItem[] {
   const items: DiagnosticItem[] = []
   const combined = [stdout, stderr].filter(Boolean).join('\n')
   if (!combined.trim()) return items
 
-  // 按块分割：常见模式为 "Category\n  line1\n  line2" 或纯行
+  // Split blocks: often "Category\n  line1" or plain lines
   const lines = combined.split(/\r?\n/).filter(Boolean)
   let currentCategory = ''
   let currentLines: string[] = []
@@ -93,7 +91,7 @@ function parseDoctorOutput(stdout: string, stderr: string): DiagnosticItem[] {
     const trimmed = line.trim()
     if (!trimmed) continue
 
-    // 可能是 category 标题（无前导空格或较短）
+    // Likely a category title (no indent, short)
     if (!line.startsWith(' ') && !line.startsWith('\t') && trimmed.length < 50) {
       if (currentCategory && currentLines.length > 0) {
         const message = currentLines.join(' ').trim()
@@ -130,9 +128,7 @@ function parseDoctorOutput(stdout: string, stderr: string): DiagnosticItem[] {
   return items
 }
 
-/**
- * 构建桌面版专属检查项
- */
+/** Desktop-only diagnostic rows */
 function buildDesktopChecks(deps: {
   readOpenClawConfig: () => { gateway?: { port?: number } }
   readShellConfig: () => { lastGatewayPort?: number }
@@ -176,9 +172,7 @@ function buildDesktopChecks(deps: {
   return items
 }
 
-/**
- * 运行完整诊断，返回结构化 DiagnosticReport
- */
+/** Full diagnostics → DiagnosticReport */
 export async function runDiagnostics(deps: {
   readOpenClawConfig: () => { gateway?: { port?: number } }
   readShellConfig: () => { lastGatewayPort?: number }
@@ -187,7 +181,7 @@ export async function runDiagnostics(deps: {
   const runAt = new Date().toISOString()
   const items: DiagnosticItem[] = []
 
-  // 1. Prestart 检查
+  // 1. Prestart
   const prestart = runPrestartCheck()
   if (!prestart.bundleCheck.ok) {
     items.push({
@@ -230,7 +224,7 @@ export async function runDiagnostics(deps: {
     })
   }
 
-  // 2. 若 bundle 存在，执行 doctor CLI
+  // 2. Doctor CLI when bundle OK
   if (prestart.bundleCheck.ok) {
     try {
       const { exitCode, stdout, stderr } = await runDoctorCli()
@@ -266,7 +260,7 @@ export async function runDiagnostics(deps: {
     }
   }
 
-  // 3. 桌面版专属检查
+  // 3. Desktop checks
   items.push(...buildDesktopChecks(deps))
 
   const hasError = items.some((i) => i.level === 'error')
@@ -279,9 +273,7 @@ export async function runDiagnostics(deps: {
   }
 }
 
-/**
- * 返回轻量摘要：ok + 前 5 条 error/warning
- */
+/** Short summary: ok flag + first 5 error/warning items */
 export function getDiagnosticsSummary(report: DiagnosticReport): {
   ok: boolean
   summary: string

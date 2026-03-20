@@ -77,24 +77,24 @@ async function cleanupBeforeQuit(): Promise<void> {
   if (isQuitting) return
   isQuitting = true
 
-  // 1. 保存窗口 bounds
+  // 1. Persist window bounds
   windowManager.persistWindowBounds()
 
-  // 2. 子进程清理（Gateway）
+  // 2. Stop child processes (gateway)
   await gatewayManager.stop(5000)
 
-  // 3. 托盘清理
+  // 3. Tear down tray
   trayManager.destroy()
 
-  // 4. IPC 处理器清理
+  // 4. Remove IPC handlers
   removeIpcHandlers()
 
-  // 5. 后台更新检查清理
+  // 5. Stop background update polling
   stopBackgroundUpdateCheck()
 }
 
 app.whenReady().then(() => {
-  // 卸载时清除登录项：支持 --clear-login-item 参数供 NSIS 卸载脚本调用
+  // Uninstaller: --clear-login-item (called from NSIS) removes login item
   if (process.argv.includes('--clear-login-item')) {
     clearLoginItem()
     app.exit(0)
@@ -147,7 +147,7 @@ app.whenReady().then(() => {
   logInfo(`[OpenClaw] paths: exe=${app.getPath('exe')} appPath=${app.getAppPath()} resources=${process.resourcesPath}`)
   logInfo(`[OpenClaw] installDir=${getInstallDir()} userDataDir=${getUserDataDir()}`)
 
-  // 1. 单实例检查
+  // 1. Single-instance lock
   const gotLock = app.requestSingleInstanceLock()
   if (!gotLock) {
     logWarn('[OpenClaw] Single instance lock failed; exiting.')
@@ -166,12 +166,12 @@ app.whenReady().then(() => {
     logInfo('[OpenClaw] Second instance attempted, focusing existing window')
   })
 
-  // 2. 加载配置
+  // 2. Load config
   let shellConfig = readShellConfig()
-  void readOpenClawConfig() // 预加载，供后续 Gateway 等使用
-  migrateAuthProfilesIfNeeded() // 迁移 credentials/ 到 agents/main/agent（原生路径）
+  void readOpenClawConfig() // Warm cache for gateway and other main-path users
+  migrateAuthProfilesIfNeeded() // Migrate legacy credentials/ → agents/main/agent (upstream layout)
   if (!openclawConfigExists()) {
-    // 首次运行进入向导时，强制使用稳定尺寸，避免残留窗口状态导致比例异常。
+    // First-run wizard: reset to stable window size (ignore stale bounds).
     shellConfig = {
       ...shellConfig,
       windowBounds: {
@@ -185,7 +185,7 @@ app.whenReady().then(() => {
     writeShellConfig(shellConfig)
   }
 
-  // 2.5 开机自启：检测系统登录项状态并同步到 ShellConfig，再应用到系统
+  // 2.5 Login item: sync OS state → ShellConfig, then apply
   const sysOpenAtLogin = getLoginItemOpenAtLogin()
   if (sysOpenAtLogin !== shellConfig.autoStart) {
     shellConfig = { ...shellConfig, autoStart: sysOpenAtLogin }
@@ -193,7 +193,7 @@ app.whenReady().then(() => {
   }
   syncLoginItemToSystem(shellConfig.autoStart)
 
-  // 3. 注册 IPC 处理器
+  // 3. Register IPC handlers
   registerIpcHandlers({
     gatewayManager,
     readOpenClawConfig,
@@ -228,12 +228,12 @@ app.whenReady().then(() => {
     },
   })
 
-  // 4. 创建主窗口（打包时用 loadFile 加载 app.asar.unpacked 内 renderer，避免白屏）
+  // 4. Main window (packaged: loadFile from asar.unpacked renderer to avoid blank screen)
   logInfo('[OpenClaw] Creating main window...')
   windowManager.createMainWindow()
   logInfo('[OpenClaw] Main window created.')
 
-  // 4.5 安装后校验（若有 .post-update-pending marker，执行 doctor+bundle 校验）
+  // 4.5 Post-update validation if .post-update-pending marker exists
   void runPostUpdateValidationIfNeeded({
     readOpenClawConfig: () => readOpenClawConfig() ?? {},
     readShellConfig: () => readShellConfig(),
@@ -243,7 +243,7 @@ app.whenReady().then(() => {
     },
   })
 
-  // electron-updater 事件推送到 Renderer（打包应用时）
+  // Forward electron-updater events to renderer (packaged builds)
   const sendToRenderer = (channel: string, ...args: unknown[]) => {
     const win = windowManager.getMainWindow()
     if (win && !win.isDestroyed()) {
@@ -268,13 +268,13 @@ app.whenReady().then(() => {
   trayManager.create()
   trayManager.setGatewayStatus(gatewayManager.getStatus().status)
 
-  // 5. 启动前校验（bundle + config）
+  // 5. Pre-start checks (bundle + config)
   const prestartCheck = runPrestartCheck()
   if (!prestartCheck.ok) {
     const detail =
       prestartCheck.errors.join('\n\n') +
       (prestartCheck.fixSuggestions.length > 0
-        ? '\n\n修复建议:\n' + prestartCheck.fixSuggestions.map((s) => `• ${s}`).join('\n')
+        ? '\n\nSuggestions:\n' + prestartCheck.fixSuggestions.map((s) => `• ${s}`).join('\n')
         : '')
     logError(`[OpenClaw] Prestart check failed: ${prestartCheck.errors.join('; ')}`)
     dialog.showErrorBox('Startup check failed', detail)
@@ -286,7 +286,7 @@ app.whenReady().then(() => {
     return
   }
 
-  // 6. 若已有配置，主进程先尝试启动 Gateway（避免 renderer 未加载导致不启动）
+  // 6. If config exists, start gateway from main (don’t wait for renderer)
   if (openclawConfigExists()) {
     const cfg = readOpenClawConfig()
     const gw = cfg?.gateway

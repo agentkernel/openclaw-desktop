@@ -1,6 +1,6 @@
 /**
- * Config 校验服务 — 通过 bundled node.exe 执行 openclaw config validate --json
- * 基于原生 Zod Schema 进行配置验证，返回结构化错误列表（字段路径 + 错误类型 + 修复建议）
+ * Run `openclaw config validate --json` via bundled node.
+ * Returns structured issues (field path, message, allowed values) from upstream Zod schema.
  */
 
 import { spawn } from 'node:child_process'
@@ -17,20 +17,20 @@ import { OPENCLAW_CONFIG_FILE } from '../../shared/constants.js'
 const CONFIG_VALIDATE_TIMEOUT_MS = 30_000
 
 export interface ConfigValidationIssue {
-  /** 配置字段路径，如 agents.defaults.model.primary */
+  /** Config field path, e.g. agents.defaults.model.primary */
   path: string
-  /** 错误消息 */
+  /** Error text */
   message: string
-  /** 允许的值列表（用于 enum 类型错误） */
+  /** Allowed values for enum-style errors */
   allowedValues?: string[]
 }
 
 export interface ConfigValidationResult {
-  /** 配置是否有效 */
+  /** Whether config passes validation */
   valid: boolean
-  /** 配置文件路径 */
+  /** Path to openclaw.json */
   configPath: string
-  /** 校验问题列表（valid=false 时） */
+  /** Issues when valid=false */
   issues: ConfigValidationIssue[]
 }
 
@@ -71,8 +71,7 @@ function parseJsonFromStdout(stdout: string): unknown {
 }
 
 /**
- * 执行 openclaw config validate --json，返回结构化校验结果
- * 当 bundled OpenClaw 不存在时（开发环境），返回 valid: false 并附带友好错误
+ * Run validate CLI; if bundle missing (typical in dev), return valid:false with a clear issue.
  */
 export async function runConfigValidate(): Promise<ConfigValidationResult> {
   const nodePath = getBundledNodePath()

@@ -1,6 +1,4 @@
-/**
- * 注册表导入/导出 — 导出选中 skills/plugins 配置为 JSON，支持导入合并
- */
+/** Export selected skills/extensions to JSON; import with merge */
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -20,7 +18,7 @@ interface ExportPayload {
 }
 
 /**
- * 导出选中的 skills 和 extensions 配置
+ * Export chosen skills + extensions
  */
 export function exportRegistry(
   deps: ImportExportDeps,
@@ -73,7 +71,7 @@ export function exportRegistry(
 }
 
 /**
- * 从 JSON 文件导入配置并合并到当前 openclaw.json
+ * Import JSON and merge into openclaw.json
  */
 export function importRegistry(
   deps: ImportExportDeps,

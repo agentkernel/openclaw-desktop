@@ -14,8 +14,8 @@ function ensureLogFile(): string {
 }
 
 /**
- * 在 Windows 控制台输出前将 Unicode 符号替换为 ASCII，避免 GBK 等非 UTF-8 代码页下的乱码。
- * Gateway (OpenClaw) 的 pino 日志常见 → ✓ ✗ 等符号，在 PowerShell/CMD 默认编码下会显示为 鈬? 鉁?。
+ * Replace common Unicode log glyphs with ASCII before writing to Windows consoles
+ * (GBK/OEM code pages mangle arrows/checkmarks from pino/OpenClaw logs).
  */
 function sanitizeForConsole(message: string): string {
   if (process.platform !== 'win32') return message

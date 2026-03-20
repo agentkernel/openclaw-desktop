@@ -1,6 +1,6 @@
 /**
- * 后台更新检查 — 按 ShellConfig.autoCheckUpdates 定时检查（默认 24h）
- * 不阻塞应用启动，发现新版本时通过回调通知
+ * Background update polling from ShellConfig.autoCheckUpdates (default 24h).
+ * Non-blocking; notifies via callback when a newer version exists.
  */
 
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24h
@@ -31,11 +31,11 @@ export function startBackgroundUpdateCheck(
         onUpdateFound({ version: result.latestVersion })
       }
     } catch {
-      // 静默失败，不阻塞
+      // Silent failure — do not block
     }
   }
 
-  // 延迟 30s 首次检查，避免阻塞启动
+  // First check after 30s to avoid startup contention
   setTimeout(() => {
     void runCheck()
     intervalId = setInterval(runCheck, CHECK_INTERVAL_MS)

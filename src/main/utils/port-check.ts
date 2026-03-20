@@ -1,11 +1,9 @@
-/**
- * 端口检测 — TCP 端口占用检测，返回占用进程信息
- */
+/** TCP port availability + optional owning PID (Windows) */
 
 import net from 'net'
 import { execSync } from 'child_process'
 
-/** 端口检测结果 */
+/** Port probe result */
 export interface PortCheckResult {
   available: boolean
   pid?: number
@@ -13,9 +11,7 @@ export interface PortCheckResult {
 }
 
 /**
- * 检测 TCP 端口是否可用
- * @param port 端口号
- * @returns 可用时 available=true；占用时 available=false，pid 为占用进程 ID（Windows 可解析）
+ * @returns available=true if free; else false with pid when known (Windows)
  */
 export function checkPort(port: number): Promise<PortCheckResult> {
   return new Promise((resolve) => {
@@ -40,7 +36,7 @@ export function checkPort(port: number): Promise<PortCheckResult> {
 }
 
 /**
- * 获取占用端口的进程信息（Windows）
+ * Resolve listening PID on Windows
  */
 function getPortOccupantInfo(port: number): PortCheckResult {
   if (process.platform !== 'win32') {
@@ -66,7 +62,7 @@ function getPortOccupantInfo(port: number): PortCheckResult {
       }
     }
   } catch {
-    // netstat 失败时仅返回占用状态
+    // If netstat fails, still report "in use" when connect fails
   }
 
   return { available: false }

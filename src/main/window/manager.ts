@@ -14,7 +14,7 @@ function getPackagedRendererCandidates(): string[] {
   return [unpacked, asar]
 }
 
-/** 打包后用 loadFile 加载解包路径，file:// 下相对路径可正确解析 */
+/** Packaged build: loadFile from unpacked path so file:// resolves relative assets */
 function getRendererIndexPath(): string {
   if (app.isPackaged) {
     for (const candidate of getPackagedRendererCandidates()) {
@@ -26,7 +26,7 @@ function getRendererIndexPath(): string {
   return path.join(__dirname, '../renderer/index.html')
 }
 
-/** 打包后 preload 路径 */
+/** Packaged preload path */
 function getPreloadCandidates(): string[] {
   const unpackedBase = path.join(process.resourcesPath, 'app.asar.unpacked', 'out', 'preload')
   const asarBase = path.join(app.getAppPath(), 'out', 'preload')

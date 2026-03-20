@@ -25,7 +25,7 @@ const PROVIDER_LABELS: Record<ModelProvider, string> = {
   mistral: 'Mistral',
   minimax: 'MiniMax',
   moonshot: 'Moonshot',
-  'moonshot-cn': 'Moonshot 中国区',
+  'moonshot-cn': 'Moonshot (China)',
   'kimi-coding': 'Kimi Coding',
   zai: 'Z.AI',
   opencode: 'OpenCode Zen',
@@ -58,7 +58,7 @@ const PROVIDER_LABELS: Record<ModelProvider, string> = {
   xiaomi: 'Xiaomi MiMo',
   chutes: 'Chutes (OAuth)',
   'copilot-proxy': 'Copilot Proxy (Local)',
-  kuae: '夸娥云 (Kuae 编程套餐)',
+  kuae: 'Kuae (Coding Plan)',
   custom: 'Custom',
 }
 
@@ -195,7 +195,7 @@ export function CompleteStep() {
             label={t('wizard.complete.provider')}
             value={
               modelConfig.provider === 'moonshot-cn' || (modelConfig.provider === 'moonshot' && modelConfig.moonshotRegion === 'cn')
-                ? 'Moonshot 中国区'
+                ? t('wizard.model.moonshotChina')
                 : PROVIDER_LABELS[modelConfig.provider]
             }
           />

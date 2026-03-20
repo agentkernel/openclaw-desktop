@@ -1,7 +1,7 @@
 /**
- * 外壳配置读写
- * 路径：%APPDATA%\OpenClaw Desktop\config.json
- * 与 OpenClaw 主配置分离，存储桌面外壳自身设置
+ * Desktop shell config read/write.
+ * Path: %APPDATA%\OpenClaw Desktop\config.json
+ * Separate from OpenClaw main config; stores shell-only settings.
  */
 
 import fs from 'node:fs'
@@ -14,9 +14,7 @@ function getShellConfigPath(): string {
   return path.join(app.getPath('appData'), APP_NAME, SHELL_CONFIG_FILE)
 }
 
-/**
- * 默认外壳配置
- */
+/** Default shell config */
 export function getDefaultShellConfig(): ShellConfig {
   return {
     closeToTray: true,
@@ -37,9 +35,9 @@ export function getDefaultShellConfig(): ShellConfig {
 }
 
 /**
- * 读取外壳配置
- * - 文件不存在 → 返回默认值
- * - 解析失败（损坏）→ 返回默认值并记录警告
+ * Read shell config.
+ * - Missing file → defaults
+ * - Parse error → defaults + warning
  */
 export function readShellConfig(): ShellConfig {
   const configPath = getShellConfigPath()
@@ -62,9 +60,7 @@ export function readShellConfig(): ShellConfig {
   }
 }
 
-/**
- * 写入外壳配置
- */
+/** Write shell config (atomic rename on Windows). */
 export function writeShellConfig(config: ShellConfig): void {
   const configPath = getShellConfigPath()
   const dir = path.dirname(configPath)

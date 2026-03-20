@@ -6,11 +6,15 @@ All notable changes to OpenClaw Desktop will be documented in this file.
 
 ### Fixed
 
-- **Kuae (夸娥云 Coding Plan) behind HTTPS proxy:** Gateway child process now merges `NO_PROXY` / `no_proxy` for `coding-plan-endpoint.kuaecloud.net` and `.kuaecloud.net` on spawn so Kuae API calls can bypass broken local TLS through `HTTP(S)_PROXY`. Other providers unchanged. Opt out with `OPENCLAW_SKIP_KUAE_NO_PROXY=1`.
+- **Kuae Coding Plan behind HTTPS proxy:** Gateway child process now merges `NO_PROXY` / `no_proxy` for `coding-plan-endpoint.kuaecloud.net` and `.kuaecloud.net` on spawn so Kuae API calls can bypass broken local TLS through `HTTP(S)_PROXY`. Other providers unchanged. Opt out with `OPENCLAW_SKIP_KUAE_NO_PROXY=1`.
+
+### Updated
+
+- **Bundled OpenClaw runtime:** Updated bundled OpenClaw to the latest version `2026.3.13`, so OpenClaw Desktop supports the latest OpenClaw runtime.
 
 ### Documentation
 
-- README Changelog section and FAQ (EN + zh-CN) for the above behavior.
+- README Changelog and FAQ (English); Chinese notes in [README.zh-CN.md](./README.zh-CN.md).
 
 ## [0.1.0] - 2026-03-10
 

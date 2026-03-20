@@ -1,6 +1,5 @@
 /**
- * Skills 状态代理 — 通过 Gateway RPC skills.status 获取技能清单
- * 合并 RPC 结果与本地 bundled 扫描，生成完整 SkillRegistryItem 列表
+ * Skills via `skills.status` RPC merged with local bundled scan → SkillRegistryItem[].
  */
 
 import type { SkillRegistryItem, SkillSource } from '../../shared/types.js'
@@ -9,7 +8,7 @@ import { GatewayRpcError } from '../gateway/rpc-client.js'
 import { listSkills } from '../registry/index.js'
 import type { RegistryServiceDeps } from '../registry/index.js'
 
-// ─── RPC 响应类型（与 OpenClaw skills.status 对齐）────────────────────────────
+// ─── RPC shape (skills.status) ───────────────────────────────────────────────
 
 interface SkillStatusEntry {
   name?: string
@@ -30,7 +29,7 @@ interface SkillsStatusReport {
   skills?: SkillStatusEntry[]
 }
 
-// ─── 映射 RPC 结果到 SkillRegistryItem ───────────────────────────────────────
+// ─── Map RPC → SkillRegistryItem ─────────────────────────────────────────────
 
 function mapRpcEntryToItem(entry: SkillStatusEntry): SkillRegistryItem {
   const skillKey = entry.skillKey ?? entry.name ?? 'unknown'
@@ -63,7 +62,7 @@ function mapRpcSourceToSkillSource(
   return 'user-workspace'
 }
 
-// ─── 合并策略：RPC 为主，本地补充 ─────────────────────────────────────────────
+// ─── Merge: RPC authoritative, local fills gaps ──────────────────────────────
 
 function mergeSkills(
   rpcItems: SkillRegistryItem[],
@@ -84,12 +83,12 @@ function mergeSkills(
   return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id))
 }
 
-// ─── 公开 API ────────────────────────────────────────────────────────────────
+// ─── Public API ───────────────────────────────────────────────────────────────
 
 export type SkillsProxyDeps = RegistryServiceDeps
 
 /**
- * 获取技能列表：优先 RPC skills.status，降级到本地扫描
+ * List skills: RPC first, local scan fallback
  */
 export async function listSkillsWithProxy(
   deps: SkillsProxyDeps,

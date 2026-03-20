@@ -1,6 +1,4 @@
-/**
- * 脱敏工具 — 用于诊断包导出，避免泄露 API Key / Token / 路径
- */
+/** Redact secrets/paths for diagnostics export */
 
 const REDACTED = '***REDACTED***'
 const USER_HOME_PLACEHOLDER = '[USER_HOME]'
@@ -56,7 +54,7 @@ export function redactPath(p: string): string {
   return p
 }
 
-/** 脱敏日志消息中的 API Key、Token、路径 */
+/** Redact keys/tokens/paths inside log lines */
 export function redactLogMessage(text: string): string {
   if (!text || typeof text !== 'string') return text
   let out = redactPath(text)

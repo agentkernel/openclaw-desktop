@@ -1,6 +1,5 @@
 /**
- * 向导 completeSetup 编排器
- * 原子性完成：openclaw.json 写入 → auth-profiles.json 写入 → Gateway 启动
+ * Wizard completeSetup orchestration: write openclaw.json → auth-profiles → start gateway.
  */
 
 import { app } from 'electron'
@@ -22,7 +21,7 @@ export interface WizardCompleteResult {
   port?: number
   error?: string
   phase?: 'config' | 'auth' | 'gateway'
-  /** 配置校验结果（向导完成后自动执行） */
+  /** Config validation after wizard (auto-run) */
   validationResult?: { valid: boolean; issues: Array<{ path: string; message: string; allowedValues?: string[] }> }
 }
 
@@ -490,7 +489,7 @@ function buildOpenClawConfig(state: WizardState): OpenClawConfig {
     }
   }
 
-  // 与原生 openclaw doctor 期望一致：wizard / logging / update / skills 基础节
+  // Baseline sections expected by openclaw doctor: wizard / logging / update / skills
   config.wizard = {
     lastRunAt: new Date().toISOString(),
     lastRunVersion: app.getVersion(),
@@ -578,7 +577,7 @@ export async function handleWizardCompleteSetup(
     console.warn('[wizard] shellConfig sync warning (non-fatal):', err instanceof Error ? err.message : String(err))
   }
 
-  // 4. 自动执行配置校验（向导完成后确保配置有效）
+  // 4. Validate config after wizard
   const validationResult = await runConfigValidate()
   const isEnvLimit = validationResult.issues.some(
     (i) => i.path.startsWith('__') && (i.path.includes('bundle') || i.path.includes('spawn') || i.path.includes('timeout')),
@@ -609,7 +608,7 @@ export async function handleWizardCompleteSetup(
       port: state.gatewayConfig.port,
       bind: state.gatewayConfig.bind,
       token: token || undefined,
-      force: false, // 首次向导完成不强制占用端口
+      force: false, // First wizard completion: do not force port takeover
     })
     const status = deps.gatewayManager.getStatus()
     return { ok: true, port: status.port }

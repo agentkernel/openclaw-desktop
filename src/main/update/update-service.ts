@@ -1,6 +1,6 @@
 /**
- * Update service — electron-updater 优先，降级 GitHub API；
- * 校验 bundle、预启动检查、安装前备份
+ * Update service: prefer electron-updater, fall back to GitHub API.
+ * Bundle verify, pre-start check, backup before install.
  */
 
 import { app } from 'electron'
@@ -98,7 +98,7 @@ export async function checkForUpdates(
       return result
     }
   } catch {
-    // 降级到 GitHub API
+    // Fall back to GitHub API
   }
   try {
     return await checkForUpdatesViaGitHub()
@@ -120,7 +120,7 @@ export function cancelDownload(): void {
 }
 
 /**
- * 备份轮转：保留最近 MAX_BACKUPS_KEEP 个更新备份
+ * Rotate update backups — keep last MAX_BACKUPS_KEEP
  */
 function pruneOldBackups(backupDir: string): void {
   try {
@@ -138,16 +138,16 @@ function pruneOldBackups(backupDir: string): void {
       try {
         fs.unlinkSync(files[i].path)
       } catch {
-        // 忽略删除失败
+        // Ignore delete errors
       }
     }
   } catch {
-    // 忽略轮转失败
+    // Ignore rotation errors
   }
 }
 
 /**
- * 更新前备份 + 安装并退出
+ * Backup then install update (app exits)
  */
 export async function installShellUpdateWithBackup(): Promise<void> {
   if (!app.isPackaged) {
@@ -167,7 +167,7 @@ export async function installShellUpdateWithBackup(): Promise<void> {
     })
   } catch (err) {
     console.warn('[update] Pre-install backup failed:', err instanceof Error ? err.message : String(err))
-    // 继续安装，不阻塞
+    // Continue install — non-blocking
   }
   quitAndInstallShell()
 }

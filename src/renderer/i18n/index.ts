@@ -1,7 +1,6 @@
 /**
- * i18n 配置 — 引导向导等 Shell 界面国际化
- * 首次加载时通过 app.getLocale() 获取系统语言，自动选择对应语言包
- * 支持：en, zh-CN, zh-TW, fr, ja, ko, es
+ * Shell i18n: resolve locale via Electron, load matching bundle.
+ * Bundles: en, zh-CN, zh-TW, fr, ja, ko, es
  */
 
 import i18n from 'i18next'
@@ -18,7 +17,7 @@ import es from './locales/es.json'
 const SUPPORTED_LOCALES = ['en', 'zh-CN', 'zh-TW', 'fr', 'ja', 'ko', 'es'] as const
 const DEFAULT_LOCALE = 'en'
 
-/** 将 Electron 返回的 locale 映射到我们支持的语言 */
+/** Map Electron locale string to a supported language code */
 function normalizeLocale(electronLocale: string): string {
   const lower = electronLocale.toLowerCase()
   if (lower.startsWith('zh')) {
@@ -35,7 +34,7 @@ function normalizeLocale(electronLocale: string): string {
   return DEFAULT_LOCALE
 }
 
-/** 使用 Electron IPC 获取系统 locale，用于初始化 i18n */
+/** Fetch system locale over IPC for i18n init */
 async function detectLocale(): Promise<string> {
   if (typeof window.electronAPI?.systemGetLocale === 'function') {
     try {
@@ -45,7 +44,7 @@ async function detectLocale(): Promise<string> {
       // fallback
     }
   }
-  // 降级：使用 navigator.language（Chromium 通常与系统一致）
+  // Fallback: navigator.language (usually matches OS in Chromium)
   return normalizeLocale(navigator.language)
 }
 
@@ -65,10 +64,10 @@ export async function initI18n(): Promise<void> {
     lng,
     fallbackLng: DEFAULT_LOCALE,
     interpolation: {
-      escapeValue: false, // React 已处理 XSS
+      escapeValue: false, // React escapes content
     },
     react: {
-      useSuspense: false, // 避免首次渲染闪烁
+      useSuspense: false, // Avoid first-paint flash
     },
   })
 }

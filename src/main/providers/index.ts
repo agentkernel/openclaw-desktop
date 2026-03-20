@@ -1,6 +1,4 @@
-/**
- * LLM Provider 与 Auth Profile 管理
- */
+/** LLM provider + auth profile management */
 
 export {
   listAuthProfiles,

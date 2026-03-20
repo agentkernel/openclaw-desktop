@@ -1,6 +1,4 @@
-/**
- * logs.tail RPC 代理 — 通过 Gateway RPC 获取 Gateway 日志流
- */
+/** Gateway RPC proxy for `logs.tail` */
 
 import { createGatewayRpcClientFromConfig } from '../gateway/rpc-client.js'
 
@@ -20,8 +18,7 @@ export interface LogsTailParams {
 }
 
 /**
- * 通过 Gateway RPC logs.tail 获取日志切片
- * Gateway 未运行时抛出错误
+ * Fetch a slice via RPC; throws if gateway is down
  */
 export async function tailLogsWithGateway(params: LogsTailParams = {}): Promise<LogsTailPayload> {
   const client = await createGatewayRpcClientFromConfig()

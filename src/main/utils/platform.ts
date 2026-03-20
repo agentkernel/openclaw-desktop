@@ -1,11 +1,10 @@
 /**
- * 平台检测 — Windows 版本与架构
- * 本项目仅支持 Windows 桌面
+ * Windows build/arch probe (desktop shell targets Windows).
  */
 
 import os from 'os'
 
-/** 平台信息 */
+/** OS/arch snapshot */
 export interface PlatformInfo {
   os: 'win32'
   windowsVersion: 10 | 11
@@ -13,8 +12,7 @@ export interface PlatformInfo {
 }
 
 /**
- * 获取当前平台信息
- * 仅支持 Windows，非 Windows 时抛出
+ * Throws if not running on Windows
  */
 export function getPlatformInfo(): PlatformInfo {
   if (process.platform !== 'win32') {

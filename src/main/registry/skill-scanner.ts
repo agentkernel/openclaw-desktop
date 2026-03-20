@@ -1,6 +1,5 @@
 /**
- * Skill 目录扫描 — 识别 SKILL.md 子目录并解析元数据
- * 与 OpenClaw 原生 skills 发现逻辑对齐（轻量实现）
+ * Scan skill folders (SKILL.md); lightweight match to upstream discovery.
  */
 
 import fs from 'node:fs'
@@ -75,7 +74,7 @@ function readSkillMeta(dirPath: string): ParsedSkillMeta | null {
 }
 
 /**
- * 扫描单个目录下的 skill 子目录（含 SKILL.md 的即为一 skill）
+ * Scan one root for child dirs containing SKILL.md
  */
 function scanDirForSkills(rootDir: string, source: SkillSource): SkillRegistryItem[] {
   const results: SkillRegistryItem[] = []
@@ -120,7 +119,7 @@ export interface ScanSkillsOptions {
 }
 
 /**
- * 扫描 skills 目录，合并 bundled、用户 workspace、extraDirs
+ * Merge bundled, user workspace, and extra skill roots
  */
 export function scanSkills(opts: ScanSkillsOptions): SkillRegistryItem[] {
   const config = opts.readOpenClawConfig()

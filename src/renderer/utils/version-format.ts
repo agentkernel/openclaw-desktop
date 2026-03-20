@@ -1,6 +1,6 @@
 import type { AppVersionInfo } from '../../shared/types'
 
-/** 格式化主版本行：「Shell vX.Y.Z · OpenClaw vY.Y.Y」 */
+/** Format main version line: Shell vX.Y.Z · OpenClaw vY.Y.Y */
 export function formatMainVersion(versions: AppVersionInfo): string {
   const shell = `Shell v${versions.shell}`
   const openclaw =

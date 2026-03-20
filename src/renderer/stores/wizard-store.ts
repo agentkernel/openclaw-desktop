@@ -278,7 +278,7 @@ export const useWizardStore = create<WizardStore>((set, get) => ({
               await window.electronAPI.shellSetConfig({ onboardingMainWindowExpanded: true })
             }
           } catch {
-            // 忽略一次性展开状态写入失败，继续跳转主界面
+            // Ignore one-shot expand flag write errors; still navigate to main UI
           } finally {
             window.location.href = url
           }
