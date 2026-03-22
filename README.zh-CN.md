@@ -5,176 +5,114 @@
 <h1 align="center">OpenClaw Desktop</h1>
 
 <p align="center">
-  <strong>OpenClaw 官方风格的桌面安装版。OpenClaw 生态系统的组成部分。</strong>
+  面向 Windows 的 OpenClaw 桌面应用与安装器，由社区维护。<br />
+  原生 GUI、内置运行时、引导式设置向导和应用内更新 —
+  在 Windows 上运行 OpenClaw 所需的一切，都在这里。
 </p>
 
 <p align="center">
-  <strong>v0.1.1 — 更新亮点 / Highlights</strong><br />
-  <strong>中文：</strong> <strong>飞书访问</strong> — 应用内私聊配对与放行名单（设置、控制台、托盘）；配对批准走内置运行时。捆绑 OpenClaw <code>2026.3.13</code>；使用 HTTPS 代理时为网关合并 Kuae 域名至 <code>NO_PROXY</code>。<br />
-  <strong>EN:</strong> <strong>Feishu Access</strong> — DM pairing &amp; allowlist in-app (Settings, Dashboard, tray); <code>pairing approve</code> uses the bundled runtime. Bundled OpenClaw <code>2026.3.13</code>; Kuae domains merged into <code>NO_PROXY</code> for the gateway behind HTTPS proxy.<br />
-  <a href="#最新亮点">详细说明 ↓</a>
+  <a href="https://github.com/agentkernel/openclaw-desktop/releases/latest">
+    <img src="https://img.shields.io/github/v/release/agentkernel/openclaw-desktop?style=flat-square&color=2563eb&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC" alt="最新版本" />
+  </a>
+  <a href="https://github.com/agentkernel/openclaw-desktop/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/agentkernel/openclaw-desktop/ci.yml?style=flat-square&label=ci" alt="CI" />
+  </a>
+  <a href="https://github.com/agentkernel/openclaw-desktop/actions/workflows/release.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/agentkernel/openclaw-desktop/release.yml?style=flat-square&label=%E5%8F%91%E5%B8%83%E6%B5%81%E7%A8%8B" alt="发版流程" />
+  </a>
+  <a href="https://github.com/agentkernel/openclaw-desktop/releases">
+    <img src="https://img.shields.io/github/downloads/agentkernel/openclaw-desktop/total?style=flat-square&color=16a34a&label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0" alt="下载量" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/agentkernel/openclaw-desktop?style=flat-square" alt="许可证" />
+  </a>
 </p>
 
 <p align="center">
-  ⭐ <strong>如果这个项目对你有帮助，请点个 Star！</strong> ⭐
+  <img src="resources/demo.gif" alt="OpenClaw Desktop 运行演示（Windows）" width="720" />
 </p>
 
-<p align="center">
-  通过原生 GUI、内置运行时、引导式安装向导、内置更新以及可下载的 <code>.exe</code> 安装程序，在 Windows 上轻松运行 OpenClaw。
-</p>
+---
 
-<p align="center">
-  <img src="resources/demo.gif" alt="OpenClaw Desktop Demo running an AI agent on Windows" width="600" />
-</p>
+**语言：** [English](./README.md) · 简体中文
 
-<p align="center">
-  <a href="https://github.com/agentkernel/openclaw-desktop/releases/latest"><img src="https://img.shields.io/github/v/release/agentkernel/openclaw-desktop?style=flat-square&color=2563eb&label=latest%20release" alt="Latest release"></a>
-  <a href="https://github.com/agentkernel/openclaw-desktop/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/agentkernel/openclaw-desktop/ci.yml?style=flat-square&label=ci" alt="CI"></a>
-  <a href="https://github.com/agentkernel/openclaw-desktop/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/agentkernel/openclaw-desktop/release.yml?style=flat-square&label=release" alt="Release workflow"></a>
-  <a href="https://github.com/agentkernel/openclaw-desktop/releases"><img src="https://img.shields.io/github/downloads/agentkernel/openclaw-desktop/total?style=flat-square&color=16a34a&label=downloads" alt="Downloads"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/agentkernel/openclaw-desktop?style=flat-square" alt="License"></a>
-</p>
+---
 
-<p align="center">
-  <a href="./README.md">English</a> •
-  <a href="#最新亮点">最新亮点</a> •
-  <a href="#下载">下载</a> •
-  <a href="#如何在-windows-上安装-openclaw">为什么需要它</a> •
-  <a href="#核心功能">核心功能</a> •
-  <a href="#快速开始">快速开始</a> •
-  <a href="#本地开发">本地开发</a> •
-  <a href="#更新日志">更新日志</a> •
-  <a href="#faq">FAQ</a>
-</p>
+## 项目简介
 
-## 最新亮点
+`OpenClaw Desktop` 把 OpenClaw 的运行环境封装成标准的 Windows 安装体验。只需下载一个 `.exe`，完成设置向导，就可以从原生桌面应用运行 OpenClaw，无需手动配置一切。
 
-**当前版本：v0.1.1** — 与上方横幅一致，下文为详细说明。
+适合以下需求：
 
-**中文 — v0.1.1 更新点**
+- 希望在 Windows 上通过安装器和 GUI 快速运行 OpenClaw
+- 使用内置 Node.js 和 OpenClaw 运行时（无需全局安装）
+- 需要可视化配置模型、频道和网关
+- 通过 GitHub Releases 做应用内更新
+- 在桌面端管理飞书配对和放行名单
 
-- **飞书访问与配对：** 在桌面端内完成飞书私聊配对与放行名单管理，无需依赖全局安装的 `openclaw` CLI。可通过 **设置 → 飞书访问**、**控制台** 或 **托盘菜单** 进入；查看待处理配对码、批准请求、维护已放行用户或手动添加 `open_id`。批准操作通过**内置** Node/OpenClaw 运行时调用，与上游行为一致。
-- **首次运行提示：** 使用飞书且为配对模式时，完成向导会提示先向机器人发私聊，再到 **设置 → 飞书访问** 完成授权。
+## v0.1.1 更新亮点
 
-**English — highlights in v0.1.1**
+- **飞书设置** — 飞书凭证、DM 配对和 allowlist 现已在桌面端统一管理。可从 **设置**、**控制台** 或 **托盘菜单** 进入。
+- **桌面端审批流程** — 待处理的飞书配对请求可直接在应用内批准。若仅有配对码，桌面端会回退到内置 OpenClaw 运行时完成审批。
+- **运行时更新** — 捆绑的 OpenClaw 已更新至 `2026.3.13`。
+- **Kuae 代理修复** — 当网关继承 `HTTP(S)_PROXY` 时，桌面端会为 `coding-plan-endpoint.kuaecloud.net` 和 `.kuaecloud.net` 自动合并 `NO_PROXY`，让 Kuae 流量绕过会导致 TLS 失败的 HTTPS 代理。
 
-- **Feishu access & pairing:** Approve Feishu DM pairing and manage the allowlist inside the desktop app—no global `openclaw` CLI required. Open **Feishu Access** from **Settings**, the **Dashboard**, or the **tray menu**; review pending pairing codes, approve requests, edit approved senders, or add an `open_id` manually. Approval calls use the **bundled** Node/OpenClaw runtime so behavior matches upstream.
-- **First-run guidance:** The setup wizard completion step reminds you to DM the bot and then finish access under **Settings → Feishu Access** when using Feishu with pairing.
-
-> `OpenClaw Desktop` 是一个 Windows 分发版，它将上游的 OpenClaw 运行时打包成更易用的桌面体验。它是广泛的 OpenClaw 生态系统的一部分。
+完整历史记录：[CHANGELOG.md](CHANGELOG.md)
 
 ## 下载
 
 **主要下载渠道：** [GitHub Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest)
 
-- 安装包文件名：`OpenClaw-Setup-0.1.1.exe`
-- 适用系统：Windows 10/11 x64
-- 包含内容：Electron 外壳、内置的 Node.js 运行时、内置的 OpenClaw 包
-- 同时发布：用于校验的 checksum 文件及用于应用内更新的 `latest.yml`
+| 项目 | 值 |
+| --- | --- |
+| 当前版本 | `v0.1.1` |
+| 安装包 | `OpenClaw-Setup-0.1.1.exe` |
+| 适用系统 | Windows 10/11 x64 |
+| 包含内容 | Electron 外壳、内置 Node.js、内置 OpenClaw |
+| 附加产物 | SHA-256 校验文件、`latest.yml`（应用内更新用） |
 
-## 更新日志
+## 界面预览
 
-### 0.1.1
-
-- **飞书访问与配对（桌面端）：** 应用内 **飞书访问**，支持待处理私聊配对与放行名单（设置、控制台、托盘）；配对批准通过内置 Node/OpenClaw 运行时执行。**English:** In-app **Feishu Access** for pending pairing and allowlist (Settings, Dashboard, tray); approve uses the bundled runtime.
-- **OpenClaw 运行时：** 捆绑的 OpenClaw 已更新至最新版本 `2026.3.13`，桌面端已支持最新版 OpenClaw 运行时。
-- **Kuae（夸娥云编程套餐）与 HTTPS 代理：** 捆绑的 OpenClaw **网关**子进程会继承系统 `HTTP(S)_PROXY`；部分本机代理会导致访问 Kuae API（`coding-plan-endpoint.kuaecloud.net`）时 TLS 失败。桌面端在启动网关时会自动**合并** `NO_PROXY` / `no_proxy`，加入 `coding-plan-endpoint.kuaecloud.net` 与 `.kuaecloud.net`，使 Kuae 相关请求**直连**，其它厂商仍按原代理设置。调试可设置环境变量 `OPENCLAW_SKIP_KUAE_NO_PROXY=1` 关闭该合并。详见 [FAQ → Kuae 与 HTTPS 代理](#faq)。
-- **文档：** README 中增加上述说明（中英 FAQ / 更新日志）。
-
-### 0.1.0
-
-- 首个公开发布轨道：Windows 安装包、引导向导、捆绑运行时与应用内更新。
-
-## 如何在 Windows 上安装 OpenClaw？
-
-`OpenClaw` 是一个强大的开源 AI Agent 项目，但许多用户想知道**如何在 Windows 上安装 OpenClaw** 或**如何在本地运行 OpenClaw**，而不必经历复杂的终端配置。`OpenClaw Desktop` 将其转化为普通的桌面安装体验：
-
-很多用户会在 GitHub / Google / AI 搜索里输入：
-
-- `how to install openclaw`
-- `openclaw windows installer`
-- `openclaw 桌面版`
-- `openclaw windows 安装器`
-- `openclaw 本地运行`
-
-`OpenClaw Desktop` 就是为这些需求设计的：它把复杂的命令行安装过程封装成一个普通 Windows 安装向导和桌面应用。
-
-- 无需手动配置，只需下载一个安装程序
-- 可通过开始菜单或桌面快捷方式启动
-- 通过可视化向导配置提供商、频道和网关
-- 通过 GitHub Releases 直接更新，无需每次重新安装
-
-本项目是为你的 AI Agent 提供的完美 OpenClaw Windows 安装器和 GUI。
-
-## 核心功能
-
-- 带有开始菜单和桌面快捷方式的 Windows 原生安装程序
-- 引导式的模型、频道、网关及 API Key 配置向导
-- 内置 Node.js 运行时，因此无需在全局安装 Node.js
-- 内置 OpenClaw 运行时，首次启动极为迅速
-- 基于 GitHub Releases 和 `electron-updater` 的内置更新流
-- 包含健康检查、包校验、回滚指导及诊断功能的更新中心
-- 系统托盘集成及登录自启动
-- 多语言 UI：English, 简体中文, 繁体中文, 日本语, 한국어, Español, Français
-- 支持 50 多家 AI 提供商及多种渠道（包括 Telegram、Discord、Slack、WhatsApp、飞书）
+| 安装器 | 设置向导 | 控制台 |
+| --- | --- | --- |
+| <img src="resources/screenshot-installer-user-scope.png" alt="安装器" width="260" /> | <img src="resources/screenshot-setup-wizard.png" alt="设置向导" width="260" /> | <img src="resources/screenshot-gateway-dashboard.png" alt="控制台" width="260" /> |
 
 ## 快速开始
 
-1. 从 [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest) 下载最新的安装程序。
+1. 从 [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest) 下载最新安装包。
 2. 运行 `OpenClaw-Setup-0.1.1.exe`。
 3. 完成安装向导并启动 `OpenClaw Desktop`。
-4. 完成模型提供商和网关的首次运行设置。
-5. 开始从原生 Windows 桌面端使用 OpenClaw。
+4. 按首次运行向导完成模型提供商、频道和网关配置。
+5. 开始在桌面端使用 OpenClaw。
 
-系统要求：
+**系统要求：** Windows 10/11 x64 · 约 350 MB 可用磁盘空间 · 网络连接（用于 API 调用和更新检查）
 
-- Windows 10/11 x64
-- 大约 350 MB 可用磁盘空间
-- 需要网络连接以调用模型 API 并进行更新检查
+## 核心功能
 
-## OpenClaw 生态系统
+- 原生 Windows 安装器，支持开始菜单和桌面快捷方式
+- 引导式设置向导，可配置模型、频道、网关和 API Key
+- 内置 Node.js 运行时，无需系统级安装
+- 内置 OpenClaw 运行时，首次启动更快速
+- 基于 GitHub Releases 和 `electron-updater` 的应用内更新
+- 更新中心含健康检查、包校验、回滚指引和诊断信息
+- 系统托盘集成和开机自启动支持
+- 多语言 UI：English、简体中文、繁体中文、日语、韩语、西班牙语、法语
+- 支持 50+ AI 提供商和多渠道：Telegram、Discord、Slack、WhatsApp、飞书等
 
-```text
-            OpenClaw
-                |
-    ----------------------------
-    |            |            |
- 桌面端          GUI         插件
-    |
- 安装器
-```
+## 飞书设置与配对
 
-相关项目：
-- [openclaw](https://github.com/openclaw/openclaw)
-- [openclaw-desktop](https://github.com/agentkernel/openclaw-desktop)
+桌面端将飞书私聊配对流程收敛到一个易用的界面：
 
-## 架构
+1. 在首次设置或 **设置** 中填写飞书凭证。
+2. 若希望先审批再对话，保持 DM 模式为 `pairing`。
+3. 让请求者在飞书中给机器人发私信。
+4. 打开 **飞书设置** 查看待审批请求、批准发送者、编辑 allowlist 或手动添加 `open_id`。
 
-```text
-OpenClaw Desktop
-├─ Electron main process
-├─ React renderer UI
-├─ Preload bridge and IPC layer
-├─ Gateway process manager
-├─ Update service
-└─ Bundled resources
-   ├─ portable Node.js runtime
-   └─ bundled OpenClaw package
-```
-
-详细信息：
-
-- [架构说明](docs/ARCHITECTURE.md)
-- [产品说明](docs/product-design.md)
-- [飞书配对与授权（桌面端）](docs/feishu-pairing-ux-plan.md)
+若待审批列表为空但已在飞书收到配对码，可使用同一页面的"配对码审批"路径——此时桌面端会回退到内置运行时处理。
 
 ## 本地开发
 
-前提条件：
-
-- Node.js `>= 22.12.0`
-- `pnpm`
-- Windows 10/11 （用于打包和端到端验证）
+**前提条件：** Node.js `>= 22.16.0` · `pnpm` · Windows 10/11
 
 ```bash
 git clone https://github.com/agentkernel/openclaw-desktop.git
@@ -183,7 +121,7 @@ pnpm install
 pnpm dev
 ```
 
-常用命令：
+**常用命令：**
 
 ```bash
 pnpm lint
@@ -191,69 +129,60 @@ pnpm type-check
 pnpm build
 pnpm run download-node
 pnpm run download-openclaw
+pnpm run verify-bundle
 pnpm run prepare-bundle
 pnpm run package:win
 ```
 
-构建输出：
+构建产物：`dist/OpenClaw-Setup-<version>.exe`
 
-- `dist/OpenClaw-Setup-<version>.exe`
+**相关文档：**
+
+- [CHANGELOG.md](CHANGELOG.md)
+- [docs/product-design.md](docs/product-design.md)
+- [docs/feishu-pairing-ux-plan.md](docs/feishu-pairing-ux-plan.md)
+- [docs/powershell-setup.md](docs/powershell-setup.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
 
 ## FAQ
 
 <details>
-<summary><strong>这是 OpenClaw 生态系统的一部分吗？</strong></summary>
+<summary><strong>需要全局安装 Node.js 吗？</strong></summary>
 
-是的，这是一个官方风格的桌面分发版，它将上游的 OpenClaw 打包成 Windows 桌面外壳，以便于本地进行简单设置。
+不需要。安装器会随应用一起提供便携版 Node.js 运行时。
 </details>
 
 <details>
-<summary><strong>我需要全局安装 Node.js 吗？</strong></summary>
+<summary><strong>安装包在哪里下载？</strong></summary>
 
-不需要。安装程序内置了便携的 Node.js 运行时，随应用一同分发。
+请访问最新发布页：[github.com/agentkernel/openclaw-desktop/releases/latest](https://github.com/agentkernel/openclaw-desktop/releases/latest)。主文件为 `OpenClaw-Setup-<version>.exe`。
 </details>
 
 <details>
-<summary><strong>我在哪里下载 EXE？</strong></summary>
+<summary><strong>用户数据存放在哪里？</strong></summary>
 
-使用最新的 release 页面：<a href="https://github.com/agentkernel/openclaw-desktop/releases/latest">github.com/agentkernel/openclaw-desktop/releases/latest</a>。主要文件是 <code>OpenClaw-Setup-&lt;version&gt;.exe</code>。
+- OpenClaw 配置：`%USERPROFILE%\.openclaw\openclaw.json`
+- 桌面端配置：`%APPDATA%\OpenClaw Desktop\config.json`
+- 日志：`%USERPROFILE%\.openclaw\`
+- 备份：`%USERPROFILE%\.openclaw\backups\`
+
+默认情况下，卸载应用不会删除这些用户配置。
 </details>
 
 <details>
-<summary><strong>我的数据存在哪里？</strong></summary>
+<summary><strong>应用更新是怎么工作的？</strong></summary>
 
-- OpenClaw 配置: `%USERPROFILE%\.openclaw\openclaw.json`
-- 桌面外壳配置: `%APPDATA%\OpenClaw Desktop\config.json`
-- 日志: `%USERPROFILE%\.openclaw\`
-- 备份: `%USERPROFILE%\.openclaw\backups\`
-
-默认情况下，卸载应用不会删除用户配置。
+桌面端会检查 GitHub Releases 并通过内置更新器下载新版本。如需回滚，也可手动下载历史发布资产。
 </details>
 
 <details>
-<summary><strong>更新机制是怎样的？</strong></summary>
+<summary><strong>Kuae HTTPS 代理修复具体做了什么？</strong></summary>
 
-该应用会检查 GitHub Releases，并通过内置的更新程序下载更新。历史发布版本也一直可用，便于手动下载和回滚。
+当捆绑的 OpenClaw 网关继承 `HTTP(S)_PROXY` 时，部分本地代理会导致访问 Kuae Coding Plan 接口时 TLS 失败。桌面端因此会为 `coding-plan-endpoint.kuaecloud.net` 和 `.kuaecloud.net` 自动合并 `NO_PROXY` / `no_proxy`，让 Kuae 请求直连，其他流量继续走代理。
+
+如需调试此行为，可在启动应用前设置 `OPENCLAW_SKIP_KUAE_NO_PROXY=1`。
 </details>
-
-## 社区与支持
-
-⭐ **Star History (Star 历史)**
-
-如果这个项目帮助你在本地运行了 OpenClaw，请考虑给我们点个 Star！
-
-⭐ **Contributors (贡献者)**
-
-欢迎贡献代码。在提交 PR 之前，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-⭐ **Community (社区)**
-
-欢迎加入我们的 Discussions，提问交流、展示你的作品或请求新功能。
-
-## 关键词 / Keywords
-
-OpenClaw Desktop · OpenClaw Windows · OpenClaw installer · OpenClaw Windows 安装器 · OpenClaw 桌面版 ·
-OpenClaw GUI · how to install openclaw · openclaw windows installer · openclaw 本地运行 · OpenClaw 安装教程
 
 ## 许可证
 
