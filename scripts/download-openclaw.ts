@@ -1,7 +1,8 @@
 /**
  * Pre-install OpenClaw npm package to build/openclaw/
  * Usage: pnpm run download-openclaw [-- <version>]
- * Default: resolves "latest" from npm registry
+ * Default: `latest` from npm. Newer npm tarballs omit `dist/control-ui/`; we fetch matching
+ * GitHub tag sources and run Vite (see ensure-openclaw-control-ui.ts).
  */
 
 import {
@@ -15,6 +16,7 @@ import {
 } from 'node:fs/promises'
 import { join } from 'node:path'
 import { execSync } from 'node:child_process'
+import { ensureOpenClawControlUiBuilt } from './ensure-openclaw-control-ui.ts'
 
 const DEFAULT_VERSION = 'latest'
 const BUILD_DIR = join(process.cwd(), 'build')
@@ -73,7 +75,10 @@ function resolveVersion(requested: string): string {
 }
 
 async function main(): Promise<void> {
-  const requestedVersion = process.argv[2] || DEFAULT_VERSION
+  const requestedVersion =
+    process.argv[2]?.trim() ||
+    process.env.OPENCLAW_DESKTOP_BUNDLE_VERSION?.trim() ||
+    DEFAULT_VERSION
 
   console.log(`\ndownload-openclaw: OpenClaw (${requestedVersion})\n`)
 
@@ -88,23 +93,33 @@ async function main(): Promise<void> {
   const version = resolveVersion(requestedVersion)
   console.log(`  [resolve] target version: ${version}`)
 
-  // Idempotent: skip if already installed with matching version
+  // Idempotent: skip if already installed with matching version (+ commander + Control UI)
   const markerPath = join(OPENCLAW_DIR, VERSION_MARKER)
+  const controlUiIndex = join(OPENCLAW_DIR, 'dist', 'control-ui', 'index.html')
   if (await fileExists(markerPath)) {
     const installed = (await readFile(markerPath, 'utf8')).trim()
     if (installed === version) {
       const commanderMismatch = await needsCommanderFix(OPENCLAW_DIR)
-      if (!commanderMismatch) {
+      const hasControlUi = await fileExists(controlUiIndex)
+      if (!commanderMismatch && hasControlUi) {
         console.log(
           `  [skip] OpenClaw ${version} already present at ${OPENCLAW_DIR}`,
         )
         return
       }
+      if (!commanderMismatch && !hasControlUi) {
+        console.log(
+          '  [info] dist/control-ui missing — building from GitHub sources for this version...',
+        )
+        await ensureOpenClawControlUiBuilt(OPENCLAW_DIR, version)
+        return
+      }
       console.log(
         `  [info] OpenClaw ${version} present but commander version mismatch — re-installing`,
       )
+    } else {
+      console.log(`  [info] Found ${installed}, need ${version} — re-installing`)
     }
-    console.log(`  [info] Found ${installed}, need ${version} — re-installing`)
     await rm(OPENCLAW_DIR, { recursive: true, force: true })
   }
 
@@ -220,6 +235,8 @@ async function main(): Promise<void> {
   if (!(await fileExists(entryJs)) && !(await fileExists(entryMjs))) {
     throw new Error('Required OpenClaw build output missing: dist/entry.(m)js')
   }
+
+  await ensureOpenClawControlUiBuilt(OPENCLAW_DIR, actualVersion)
 
   console.log(`\n  OK: OpenClaw ${actualVersion} ready at ${OPENCLAW_DIR}\n`)
 }

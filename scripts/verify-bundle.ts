@@ -67,6 +67,16 @@ async function main(): Promise<void> {
     throw new Error(`OpenClaw dist missing: ${missing.join(', ')}`)
   }
 
+  const controlUiIndex = join(OPENCLAW_DIR, 'dist', 'control-ui', 'index.html')
+  if (!(await fileExists(controlUiIndex))) {
+    throw new Error(
+      'OpenClaw Control UI assets missing (dist/control-ui/index.html). ' +
+        'Recent npm releases may omit them; pin a version in download-openclaw or run ' +
+        '"pnpm run download-openclaw" with a version that ships dist/control-ui.',
+    )
+  }
+  console.log('  [ok] dist/control-ui/index.html present')
+
   // DEPLOY-P55: verify bundled openclaw supports doctor/config/backup/plugins CLI
   const nodeUnix = join(BUILD_DIR, 'node', 'node')
   const nodeBin = (await fileExists(NODE_EXE)) ? NODE_EXE : nodeUnix

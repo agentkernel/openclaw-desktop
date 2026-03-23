@@ -62,6 +62,11 @@ function validateOpenclaw(openclawDir) {
     missing.push('dist/entry.(m)js (read failed)')
   }
 
+  const controlUiIndex = path.join(openclawDir, 'dist', 'control-ui', 'index.html')
+  if (!exists(controlUiIndex)) {
+    missing.push('dist/control-ui/index.html (gateway Control UI)')
+  }
+
   return missing
 }
 

@@ -209,7 +209,12 @@ async function main(): Promise<void> {
     DEST_OPENCLAW,
     'openclaw',
     OPENCLAW_VERSION_MARKER,
-    ['openclaw.mjs', ['dist/entry.js', 'dist/entry.mjs'], 'node_modules'],
+    [
+      'openclaw.mjs',
+      ['dist/entry.js', 'dist/entry.mjs'],
+      join('dist', 'control-ui', 'index.html'),
+      'node_modules',
+    ],
     forceOpenclawCopy,
   )
 
@@ -225,6 +230,7 @@ async function main(): Promise<void> {
     join(DEST_NODE, 'node.exe'),
     join(DEST_OPENCLAW, 'openclaw.mjs'),
     join(DEST_OPENCLAW, 'dist'),
+    join(DEST_OPENCLAW, 'dist', 'control-ui', 'index.html'),
     join(DEST_OPENCLAW, 'node_modules'),
   ]
   for (const p of required) {
