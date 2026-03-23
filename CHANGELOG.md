@@ -2,6 +2,12 @@
 
 All notable changes to OpenClaw Desktop will be documented in this file.
 
+## [0.2.1] - 2026-03-23
+
+### Updated
+
+- **Bundled OpenClaw runtime:** `2026.3.22` (npm `latest`), bringing upstream fixes and features to the Windows installer bundle.
+
 ## [0.2.0] - 2026-03-22
 
 ### Added

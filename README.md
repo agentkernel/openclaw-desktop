@@ -48,18 +48,17 @@ If you've been searching for *how to install OpenClaw on Windows*, *how to run O
 ## Quick Start
 
 1. Download the latest installer from [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest)
-2. Run `OpenClaw-Setup-0.2.0.exe`
+2. Run `OpenClaw-Setup-0.2.1.exe`
 3. Finish the setup wizard (provider → channel → gateway)
 4. Launch from Start Menu or Desktop shortcut
 
 **System:** Windows 10/11 x64 · ~350 MB free space · Internet for API calls
 
-## What's New in v0.2.0
+## What's New in v0.2.1
 
-- **Feishu Access** — full-screen Feishu hub for credentials, pending pairing queue, pairing-code approval, and allowlist edits (from **Settings**, **Dashboard**, or **tray**)
-- **Localized tray** — tray menu strings follow your UI language
-- **i18n** — broader shell coverage; `pnpm i18n:zh-tw` for Traditional Chinese maintenance; installer ships EN / zh-CN / zh-TW license pages
-- **Shell polish** — dashboard, settings, wizard, about, and updates UX refinements
+- **Bundled OpenClaw runtime** — updated to `2026.3.22` (npm latest) for the packaged Windows app and installer.
+
+Earlier highlights (v0.2.0): Feishu Access hub, localized tray, i18n, installer license pages, shell UX refinements — see [CHANGELOG.md](CHANGELOG.md).
 
 Earlier highlights (v0.1.1): Feishu settings entry points, desktop pairing approval, bundled OpenClaw `2026.3.13`, Kuae `NO_PROXY` merge — see [CHANGELOG.md](CHANGELOG.md).
 
@@ -97,8 +96,8 @@ OpenClaw Desktop is a **community-maintained Windows distribution** for the Open
 
 | | |
 |---|---|
-| **Release** | `v0.2.0` |
-| **Installer** | `OpenClaw-Setup-0.2.0.exe` |
+| **Release** | `v0.2.1` |
+| **Installer** | `OpenClaw-Setup-0.2.1.exe` |
 | **Platform** | Windows 10/11 x64 |
 | **Includes** | Electron shell, portable Node.js, bundled OpenClaw |
 | **Extras** | SHA-256 checksum, `latest.yml` for in-app updates |
@@ -127,7 +126,7 @@ If the pending list is empty but you have a pairing code, use the code-based app
 <details>
 <summary><strong>How do I install OpenClaw on Windows?</strong></summary>
 
-Download `OpenClaw-Setup-0.2.0.exe` from the [latest release](https://github.com/agentkernel/openclaw-desktop/releases/latest) and run it. That's it — no `npm`, no system-wide Node.js, no terminal commands needed.
+Download `OpenClaw-Setup-0.2.1.exe` from the [latest release](https://github.com/agentkernel/openclaw-desktop/releases/latest) and run it. That's it — no `npm`, no system-wide Node.js, no terminal commands needed.
 </details>
 
 <details>
