@@ -132,6 +132,41 @@ function migrateDesktopControlUiAllowInsecureAuth(
   return { config: next, changed: true }
 }
 
+/**
+ * OpenClaw 2026.1.29+: gateway auth mode `none` removed — gateway must use token or password.
+ * Migrate legacy `mode: "none"` using whichever credential field is present.
+ */
+function migrateGatewayAuthModeNoneRemoved(
+  config: OpenClawConfig,
+): { config: OpenClawConfig; changed: boolean } {
+  const gw = config.gateway
+  const auth = gw && typeof gw === 'object' ? gw.auth : undefined
+  if (!auth || typeof auth !== 'object') {
+    return { config, changed: false }
+  }
+  const mode = (auth as Record<string, unknown>).mode
+  if (mode !== 'none') {
+    return { config, changed: false }
+  }
+
+  const next = JSON.parse(JSON.stringify(config)) as OpenClawConfig
+  const na = next.gateway?.auth
+  if (!na || typeof na !== 'object') {
+    return { config, changed: false }
+  }
+  const token = typeof na.token === 'string' ? na.token.trim() : ''
+  const rawPw = (na as Record<string, unknown>).password
+  const password = typeof rawPw === 'string' ? rawPw.trim() : ''
+  if (token) {
+    na.mode = 'token'
+  } else if (password) {
+    na.mode = 'password'
+  } else {
+    delete na.mode
+  }
+  return { config: next, changed: true }
+}
+
 function migrateFeishuDmPolicy(config: OpenClawConfig): { config: OpenClawConfig; changed: boolean } {
   const feishu = config.channels?.feishu
   if (!feishu || typeof feishu !== 'object' || Array.isArray(feishu)) {
@@ -171,7 +206,14 @@ export function readOpenClawConfig(): OpenClawConfig {
       cfg = migratedFeishu.config
       const migratedControlUi = migrateDesktopControlUiAllowInsecureAuth(cfg)
       cfg = migratedControlUi.config
-      if (migratedProviders.changed || migratedFeishu.changed || migratedControlUi.changed) {
+      const migratedAuthNone = migrateGatewayAuthModeNoneRemoved(cfg)
+      cfg = migratedAuthNone.config
+      if (
+        migratedProviders.changed ||
+        migratedFeishu.changed ||
+        migratedControlUi.changed ||
+        migratedAuthNone.changed
+      ) {
         try {
           writeOpenClawConfig(cfg)
           if (migratedProviders.changed) {
@@ -184,6 +226,9 @@ export function readOpenClawConfig(): OpenClawConfig {
             console.info(
               '[config] Set gateway.controlUi.allowInsecureAuth=true for embedded Control UI (OpenClaw 2026.3+)',
             )
+          }
+          if (migratedAuthNone.changed) {
+            console.info('[config] Migrated gateway.auth.mode from \"none\" (removed upstream) in openclaw.json')
           }
         } catch (err) {
           console.warn(

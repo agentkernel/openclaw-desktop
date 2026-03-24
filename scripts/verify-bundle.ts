@@ -122,6 +122,32 @@ async function main(): Promise<void> {
   }
   console.log('  [verify] CLI subcommands OK')
 
+  // Desktop spawns: node openclaw.mjs gateway run --allow-unconfigured --bind loopback --port <n> [--token ... --auth token] [--force]
+  console.log('  [verify] checking OpenClaw CLI "gateway run" (desktop launch path)...')
+  const rGatewayRun = spawnSync(nodeBin, [openclawMjs, 'gateway', 'run', '--help'], {
+    encoding: 'utf8',
+    timeout: CLI_VERIFY_TIMEOUT_MS,
+    env: verifyEnv,
+  })
+  if (rGatewayRun.error && (rGatewayRun.error as NodeJS.ErrnoException).code === 'ETIMEDOUT') {
+    throw new Error(
+      `OpenClaw "gateway run --help" timed out after ${CLI_VERIFY_TIMEOUT_MS}ms. Increase OPENCLAW_CLI_VERIFY_TIMEOUT_MS and retry.`,
+    )
+  }
+  const gwHelp = ((rGatewayRun.stdout ?? '') + (rGatewayRun.stderr ?? '')).toLowerCase()
+  const gatewayRunOk =
+    rGatewayRun.status === 0 ||
+    (gwHelp.includes('--port') &&
+      (gwHelp.includes('allow-unconfigured') || gwHelp.includes('unconfigured')) &&
+      (gwHelp.includes('--bind') || gwHelp.includes('bind')))
+  if (!gatewayRunOk) {
+    throw new Error(
+      'OpenClaw "gateway run" command missing or does not advertise expected flags. ' +
+        'Refresh bundle: pnpm run download-openclaw',
+    )
+  }
+  console.log('  [verify] gateway run OK')
+
   console.log('  OK: build/ resources are complete\n')
 }
 

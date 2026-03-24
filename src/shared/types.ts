@@ -44,9 +44,9 @@ export interface ShellConfig {
 
 // ─── OpenClawConfig ───────────────────────────────────────────────────────────
 
-/** Gateway authentication config */
+/** Gateway authentication config (upstream: `none` mode removed — use token or password) */
 export interface GatewayAuthConfig {
-  mode?: 'token' | 'password' | 'none'
+  mode?: 'token' | 'password'
   token?: string
 }
 
