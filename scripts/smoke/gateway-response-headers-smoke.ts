@@ -24,12 +24,12 @@ function testFrameAncestorsRelaxation(): void {
   const replaced = relaxGatewayFrameAncestors("default-src 'self'; frame-ancestors 'none'; script-src 'self'")
   assert.match(replaced, /default-src 'self';/)
   assert.match(replaced, /script-src 'self'/)
-  assert.match(replaced, /frame-ancestors 'self' file: http:\/\/localhost:\*/)
+  assert.match(replaced, /frame-ancestors 'self' file:.*http:\/\/localhost:\*/)
 
   const appended = relaxGatewayFrameAncestors("default-src 'self'")
   assert.equal(
     appended,
-    "default-src 'self'; frame-ancestors 'self' file: http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*",
+    "default-src 'self'; frame-ancestors 'self' file: openclaw-shell://renderer http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*",
   )
 
   const fromEmpty = relaxGatewayFrameAncestors('')
@@ -47,7 +47,7 @@ function testHeaderPatchForLoopbackResponse(): void {
   assert.equal((patched as Record<string, unknown>)['X-Frame-Options'], undefined)
   assert.equal(
     patched?.['Content-Security-Policy']?.[0],
-    "default-src 'self'; frame-ancestors 'self' file: http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*",
+    "default-src 'self'; frame-ancestors 'self' file: openclaw-shell://renderer http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*",
   )
   assert.deepEqual(patched?.Server, ['openclaw'])
 }

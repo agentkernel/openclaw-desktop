@@ -1,10 +1,11 @@
 import { app, BrowserWindow, shell, nativeImage } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import type { ShellConfig } from '../../shared/types.js'
 import { getLocalizedShellWindowTitle, normalizeToShellLocale } from '../../shared/shell-locale.js'
 import { logError, logInfo, logWarn } from '../utils/logger.js'
+import { getShellIndexPageUrl, isShellCustomProtocolUrl } from '../shell-protocol.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -111,6 +112,10 @@ function isAllowedNavigation(url: string, port: number): boolean {
     return true
   }
 
+  if (isShellCustomProtocolUrl(url)) {
+    return true
+  }
+
   if (isControlUIUrl(url, port)) {
     return true
   }
@@ -191,8 +196,7 @@ export class WindowManager {
     if (!app.isPackaged) {
       window.once('ready-to-show', showWhenReady)
     }
-    // When packaged: do NOT show on ready-to-show (would show bootstrap/black screen).
-    // Show only after the actual renderer (index.html) has loaded.
+    // When packaged: show only after shell URL has finished loading (see loadURL().then).
 
     let loadErrorShown = false
     const showLoadError = (title: string, detail: string) => {
@@ -217,49 +221,35 @@ export class WindowManager {
 
     if (process.env.ELECTRON_RENDERER_URL) {
       void window.loadURL(process.env.ELECTRON_RENDERER_URL).then(openDevToolsIfRequested)
-    } else if (app.isPackaged) {
-      const rendererPath = getRendererIndexPath()
-      const rendererCandidates = getPackagedRendererCandidates()
-      logInfo(
-        `[OpenClaw] Packaged: rendererPath=${rendererPath} candidates=${JSON.stringify(
-          rendererCandidates,
-        )} exists=${JSON.stringify(rendererCandidates.map((p) => fs.existsSync(p)))}`
-      )
-      const bootstrapHtml =
-        `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(initialTitle)}</title></head><body style="margin:0;background:transparent;"></body></html>`
-      void window
-        .loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(bootstrapHtml))
-        .then(() => {
-          openDevToolsIfRequested()
-          if (window.isDestroyed()) return
-          void window
-            .loadFile(rendererPath)
-            .then(() => {
-              if (!window.isDestroyed()) showWhenReady()
-            })
-            .catch((err) => {
-              logError(`[OpenClaw] Failed to load renderer: ${rendererPath} ${(err instanceof Error ? err.message : String(err))}`)
-              showLoadError(
-                'Renderer load failed',
-                `Path: ${rendererPath}\n\nError: ${err instanceof Error ? err.message : String(err)}\n\n` +
-                  `Check that dist\\win-unpacked\\resources\\app.asar.unpacked\\out\\renderer or resources\\app.asar\\out\\renderer exists.`,
-              )
-              if (!window.isDestroyed()) showWhenReady()
-            })
-        })
-        .catch(() => {
-          showLoadError('Bootstrap failed', 'Unable to load bootstrap page')
-          if (!window.isDestroyed()) showWhenReady()
-        })
     } else {
       const rendererPath = getRendererIndexPath()
+      const shellUrl = getShellIndexPageUrl()
+      if (app.isPackaged) {
+        const rendererCandidates = getPackagedRendererCandidates()
+        logInfo(
+          `[OpenClaw] Packaged: shellUrl=${shellUrl} rendererPath=${rendererPath} candidates=${JSON.stringify(
+            rendererCandidates,
+          )} exists=${JSON.stringify(rendererCandidates.map((p) => fs.existsSync(p)))}`
+        )
+      } else {
+        logInfo(`[OpenClaw] Dev build: shellUrl=${shellUrl} rendererPath=${rendererPath}`)
+      }
       void window
-        .loadFile(rendererPath)
-        .then(openDevToolsIfRequested)
+        .loadURL(shellUrl)
+        .then(() => {
+          openDevToolsIfRequested()
+          if (!window.isDestroyed()) showWhenReady()
+        })
         .catch((err) => {
-          logError(`[OpenClaw] Failed to load renderer: ${rendererPath} ${(err instanceof Error ? err.message : String(err))}`)
-          const msg = err instanceof Error ? err.message : String(err)
-          showLoadError('Renderer load failed', `Path: ${rendererPath}\nError: ${msg}`)
+          logError(
+            `[OpenClaw] Failed to load shell URL: ${shellUrl} ${err instanceof Error ? err.message : String(err)}`,
+          )
+          showLoadError(
+            'Renderer load failed',
+            `URL: ${shellUrl}\nPath: ${rendererPath}\n\nError: ${err instanceof Error ? err.message : String(err)}\n\n` +
+              `Check that out\\renderer (or app.asar.unpacked\\out\\renderer) contains index.html and assets.`,
+          )
+          if (!window.isDestroyed()) showWhenReady()
         })
     }
 
@@ -289,7 +279,12 @@ export class WindowManager {
         return
       }
 
-      if (validatedURL && (validatedURL.startsWith('file:') || validatedURL.startsWith('data:'))) {
+      if (
+        validatedURL &&
+        (validatedURL.startsWith('file:') ||
+          validatedURL.startsWith('data:') ||
+          isShellCustomProtocolUrl(validatedURL))
+      ) {
         const title = 'Page load failed (did-fail-load)'
         const detail = `code: ${errorCode}\ndescription: ${errorDescription}\nurl: ${url}`
         showLoadError(title, detail)
@@ -328,6 +323,7 @@ export class WindowManager {
     const currentUrl = window.webContents.getURL()
     const canPatchHash =
       (currentUrl.startsWith('file:') && !currentUrl.startsWith('data:')) ||
+      isShellCustomProtocolUrl(currentUrl) ||
       (!!process.env.ELECTRON_RENDERER_URL && currentUrl.startsWith('http'))
 
     if (canPatchHash) {
@@ -350,9 +346,7 @@ export class WindowManager {
       void window.loadURL(`${base}${safeHash}`)
       return
     }
-    const rendererPath = getRendererIndexPath()
-    const fileUrl = pathToFileURL(rendererPath).href + safeHash
-    void window.loadURL(fileUrl)
+    void window.loadURL(getShellIndexPageUrl(safeHash))
   }
 
   showErrorPage(title: string, detail: string): void {

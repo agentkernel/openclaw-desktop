@@ -27,6 +27,10 @@ import { patchGatewayResponseHeaders } from './security/gateway-response-headers
 import { rewriteGatewayRequestUrlWithToken } from './security/gateway-request-auth.js'
 import { listPendingFeishuPairing } from './pairing/index.js'
 import { resolveTrayLocale, getFeishuPairingNotificationStrings, formatFeishuPairingBody } from './tray/tray-i18n.js'
+import { registerShellFileProtocol, registerShellPrivileges } from './shell-protocol.js'
+
+/** Must run before app 'ready' so the shell can use openclaw-shell:// instead of file:// */
+registerShellPrivileges()
 
 process.on('uncaughtException', (error) => {
   if ((error as NodeJS.ErrnoException).code === 'EPIPE') return
@@ -117,6 +121,7 @@ app.whenReady().then(() => {
 
   Menu.setApplicationMenu(null) // Remove View, File, etc. menu bar
   initShellLog()
+  registerShellFileProtocol()
 
   // Allow Control UI to be embedded in our Shell iframe: OpenClaw sets X-Frame-Options: DENY
   // and frame-ancestors 'none', which would block the iframe. We intercept and relax these

@@ -1,7 +1,7 @@
 export const LOOPBACK_GATEWAY_HOSTS = new Set(['127.0.0.1', 'localhost', '::1'])
 
 export const RELAXED_GATEWAY_FRAME_ANCESTORS =
-  "frame-ancestors 'self' file: http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*"
+  "frame-ancestors 'self' file: openclaw-shell://renderer http://localhost:* http://127.0.0.1:* http://[::1]:* https://localhost:* https://127.0.0.1:* https://[::1]:*"
 
 export type GatewayResponseHeadersInput = Record<string, string[] | string | undefined>
 export type GatewayResponseHeaders = Record<string, string[]>
