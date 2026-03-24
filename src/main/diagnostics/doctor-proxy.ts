@@ -6,7 +6,7 @@
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import fs from 'node:fs'
-import type { DiagnosticReport, DiagnosticItem, OpenClawConfig } from '../../shared/types.js'
+import type { DiagnosticReport, DiagnosticItem } from '../../shared/types.js'
 import { getBundledNodePath, getBundledOpenClawDir, getBundledOpenClawPath, getUserDataDir } from '../utils/paths.js'
 import { OPENCLAW_CONFIG_FILE } from '../../shared/constants.js'
 import { runPrestartCheck } from './prestart-check.js'
@@ -141,12 +141,14 @@ function isPathEqualOrNested(baseDir: string, candidate: string): boolean {
 
 /** Desktop-only diagnostic rows */
 function buildDesktopChecks(deps: {
-  readOpenClawConfig: () => OpenClawConfig
+  readOpenClawConfig: () => unknown
   readShellConfig: () => { lastGatewayPort?: number }
   gatewayStatus: () => { running: boolean; status: string }
 }): DiagnosticItem[] {
   const items: DiagnosticItem[] = []
-  const openclaw = deps.readOpenClawConfig()
+  const openclaw = deps.readOpenClawConfig() as {
+    gateway?: { port?: number; mode?: string; controlUi?: { root?: unknown } }
+  }
   const shell = deps.readShellConfig()
   const gw = deps.gatewayStatus()
 
@@ -209,7 +211,7 @@ function buildDesktopChecks(deps: {
 
 /** Full diagnostics → DiagnosticReport */
 export async function runDiagnostics(deps: {
-  readOpenClawConfig: () => OpenClawConfig
+  readOpenClawConfig: () => unknown
   readShellConfig: () => { lastGatewayPort?: number }
   gatewayStatus: () => { running: boolean; status: string }
 }): Promise<DiagnosticReport> {

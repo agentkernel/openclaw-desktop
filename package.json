@@ -1,6 +1,6 @@
 {
   "name": "openclaw-desktop",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "Community-maintained Windows desktop app and installer for OpenClaw.",
   "type": "module",
   "main": "out/main/index.js",
