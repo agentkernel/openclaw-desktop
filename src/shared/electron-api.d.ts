@@ -129,6 +129,8 @@ export interface ElectronAPI {
   gatewayStop: () => Promise<void>
   gatewayRestart: () => Promise<GatewayStartResult>
   gatewayStatus: () => Promise<GatewayStatus>
+  /** Succeeds when WebSocket operator connect matches Control UI (avoids showing iframe during key/bootstrap UI). */
+  gatewayProbeOperator: (opts?: { port?: number }) => Promise<{ ok: true }>
   configRead: () => Promise<OpenClawConfig>
   configWrite: (config: OpenClawConfig) => Promise<void>
   configExists: () => Promise<boolean>

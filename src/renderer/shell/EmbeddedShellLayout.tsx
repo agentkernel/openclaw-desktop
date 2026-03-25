@@ -76,6 +76,8 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
   const [timedOut, setTimedOut] = useState(false)
   const [gatewayPort, setGatewayPort] = useState<number | null>(null)
   const [controlUrl, setControlUrl] = useState<string | null>(null)
+  /** True only after WebSocket operator handshake succeeds (Control UI can load without stuck key screen). */
+  const [controlUiOperatorReady, setControlUiOperatorReady] = useState(false)
   /** Bumps when the gateway process restarts so the iframe remounts and opens a fresh WebSocket (same #token URL would otherwise not reload). */
   const [controlUiReloadKey, setControlUiReloadKey] = useState(0)
   const prevGatewayStatusRef = useRef<GatewayStatusValue | null>(null)
@@ -116,7 +118,6 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
 
       setStatusText(STATUS_LABELS[status.status])
       if (status.status === 'running') {
-        clearTimeoutTimer()
         setGatewayView('loading')
 
         const resumedFromNonRunning = prev !== 'running'
@@ -150,6 +151,7 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
         if (prev === 'running') {
           setGatewayPort(null)
           setControlUrl(null)
+          setControlUiOperatorReady(false)
         }
         if (status.status === 'error') {
           showError({
@@ -160,8 +162,35 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
         }
       }
     },
-    [clearTimeoutTimer, showError],
+    [showError],
   )
+
+  useEffect(() => {
+    if (!gatewayPort || !controlUrl || gatewayView !== 'loading') {
+      return
+    }
+    setControlUiOperatorReady(false)
+    let cancelled = false
+    const probe = async () => {
+      try {
+        await window.electronAPI.gatewayProbeOperator({ port: gatewayPort })
+        if (!cancelled) {
+          setControlUiOperatorReady(true)
+          clearTimeoutTimer()
+        }
+      } catch {
+        // Gateway WS/session not ready yet — keep startup loading UI.
+      }
+    }
+    void probe()
+    const interval = setInterval(() => {
+      void probe()
+    }, 900)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [gatewayPort, controlUrl, controlUiReloadKey, gatewayView, clearTimeoutTimer])
 
   useEffect(() => {
     let mounted = true
@@ -252,7 +281,13 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
     onPanelChange(panel)
   }
 
-  const showControlUIIframe = gatewayPort !== null && controlUrl !== null
+  const showControlUIIframe =
+    gatewayPort !== null && controlUrl !== null && controlUiOperatorReady
+  const awaitingControlUiSession =
+    gatewayView === 'loading' &&
+    gatewayPort !== null &&
+    (controlUrl === null || !controlUiOperatorReady)
+  const loadingStatusText = awaitingControlUiSession ? t('shell.status.starting') : statusText
   const hasActivePanel = activePanel !== ''
 
   if (gatewayView === 'error' && errorInfo) {
@@ -333,7 +368,7 @@ export function EmbeddedShellLayout({ activePanel, onPanelChange }: EmbeddedShel
           <div className="absolute inset-0 z-0 flex min-h-0 items-center justify-center overflow-auto p-4">
             <LoadingView
               variant="embedded"
-              statusText={statusText}
+              statusText={loadingStatusText}
               timedOut={timedOut}
               onRetry={handleRetry}
               hintText="Startup takes approximately 5 minutes, please wait."

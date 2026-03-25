@@ -2,6 +2,12 @@
 
 All notable changes to OpenClaw Desktop will be documented in this file.
 
+## [0.3.0] - 2026-03-25
+
+### Fixed
+
+- **Embedded Control UI:** After the gateway reports HTTP/TCP ready, the shell now waits for a successful WebSocket **operator** handshake (`gateway:probeOperator` IPC) before mounting the Control UI iframe. The loading screen stays on **Gateway starting** until then, avoiding a flash of the gateway key / bootstrap UI before the real console appears.
+
 ## [0.2.22] - 2026-03-25
 
 ### Fixed

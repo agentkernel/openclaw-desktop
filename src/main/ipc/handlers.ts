@@ -10,6 +10,7 @@ import {
   IPC_GATEWAY_STOP,
   IPC_GATEWAY_RESTART,
   IPC_GATEWAY_STATUS,
+  IPC_GATEWAY_PROBE_OPERATOR,
   IPC_CONFIG_READ,
   IPC_CONFIG_WRITE,
   IPC_CONFIG_EXISTS,
@@ -120,6 +121,7 @@ import {
   listPendingFeishuPairing,
   removeApprovedFeishuSender,
 } from '../pairing/index.js'
+import { createGatewayRpcClientFromConfig } from '../gateway/rpc-client.js'
 
 export interface IpcResult<T = unknown> {
   success: boolean
@@ -237,6 +239,30 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
   ipcMain.handle(
     IPC_GATEWAY_STATUS,
     wrapHandler('GATEWAY_STATUS', () => gatewayManager.getStatus()),
+  )
+
+  ipcMain.handle(
+    IPC_GATEWAY_PROBE_OPERATOR,
+    wrapHandler('GATEWAY_PROBE_OPERATOR', async (raw?: unknown) => {
+      const status = await gatewayManager.getStatus()
+      if (status.status !== 'running') {
+        throw new Error('Gateway is not running')
+      }
+      let port = status.port
+      if (raw && typeof raw === 'object' && raw !== null && 'port' in raw) {
+        const p = (raw as { port?: unknown }).port
+        if (typeof p === 'number' && p > 0 && p <= 65535) {
+          port = p
+        }
+      }
+      const client = await createGatewayRpcClientFromConfig({ port })
+      try {
+        await client.connect()
+      } finally {
+        client.close()
+      }
+      return { ok: true as const }
+    }),
   )
 
   ipcMain.handle(
@@ -892,6 +918,7 @@ export function removeIpcHandlers(): void {
   ipcMain.removeHandler(IPC_GATEWAY_STOP)
   ipcMain.removeHandler(IPC_GATEWAY_RESTART)
   ipcMain.removeHandler(IPC_GATEWAY_STATUS)
+  ipcMain.removeHandler(IPC_GATEWAY_PROBE_OPERATOR)
   ipcMain.removeHandler(IPC_CONFIG_READ)
   ipcMain.removeHandler(IPC_CONFIG_WRITE)
   ipcMain.removeHandler(IPC_CONFIG_EXISTS)

@@ -48,15 +48,17 @@ If you've been searching for *how to install OpenClaw on Windows*, *how to run O
 ## Quick Start
 
 1. Download the latest installer from [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest)
-2. Run `OpenClaw-Setup-0.2.22.exe`
+2. Run `OpenClaw-Setup-0.3.0.exe`
 3. Finish the setup wizard (provider → channel → gateway)
 4. Launch from Start Menu or Desktop shortcut
 
 **System:** Windows 10/11 x64 · ~350 MB free space · Internet for API calls
 
-## What's New in v0.2.22
+## What's New in v0.3.0
 
-- **Control UI (Lit + Electron):** Desktop-only patches to OpenClaw `ui/` Vite/tsconfig so Lit field decorators compile for embedded Chromium; npm `dist/control-ui` is discarded so local/CI always rebuilds with that toolchain.
+- **Embedded Control UI:** The shell waits for a WebSocket **operator** handshake before mounting the gateway dashboard iframe, keeping the **Gateway starting** loading state until the console session is ready—no flash of the gateway key / bootstrap UI.
+
+Earlier highlights (v0.2.22): Lit + Electron Control UI build patches — see [CHANGELOG.md](CHANGELOG.md).
 
 Earlier highlights (v0.2.21): esbuild post-pass on bundled Control UI + stable updater `latest.yml` — see [CHANGELOG.md](CHANGELOG.md).
 
@@ -116,8 +118,8 @@ OpenClaw Desktop is a **community-maintained Windows distribution** for the Open
 
 | | |
 |---|---|
-| **Release** | `v0.2.22` |
-| **Installer** | `OpenClaw-Setup-0.2.22.exe` |
+| **Release** | `v0.3.0` |
+| **Installer** | `OpenClaw-Setup-0.3.0.exe` |
 | **Platform** | Windows 10/11 x64 |
 | **Includes** | Electron shell, portable Node.js, bundled OpenClaw |
 | **Extras** | SHA-256 checksum, `latest.yml` for in-app updates |
@@ -198,7 +200,7 @@ pnpm run prepare-bundle
 pnpm run package:win   # Output: dist/OpenClaw-Setup-<version>.exe
 ```
 
-**Bundled OpenClaw:** Pinned in `package.json` (`openclawBundleVersion`). After `prepare-bundle`, see `bundledOpenClawVersion` in [`resources/bundle-manifest.json`](resources/bundle-manifest.json) (currently **2026.3.23-2** for desktop **v0.2.22**). Local checks: `pnpm run check-openclaw-versions` (omit `OPENCLAW_SKIP_NPM_LATEST_CHECK` to also compare against npm `latest`).
+**Bundled OpenClaw:** Pinned in `package.json` (`openclawBundleVersion`). After `prepare-bundle`, see `bundledOpenClawVersion` in [`resources/bundle-manifest.json`](resources/bundle-manifest.json) (currently **2026.3.23-2** for desktop **v0.3.0**). Local checks: `pnpm run check-openclaw-versions` (omit `OPENCLAW_SKIP_NPM_LATEST_CHECK` to also compare against npm `latest`).
 
 **Related docs:** [CHANGELOG.md](CHANGELOG.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
 
