@@ -6,6 +6,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
+import { app } from 'electron'
 import JSON5 from 'json5'
 import type { OpenClawConfig } from '../../shared/types.js'
 import { getBundledOpenClawDir, getUserDataDir } from '../utils/paths.js'
@@ -211,6 +212,8 @@ function isPathEqualOrNested(baseDir: string, candidate: string): boolean {
 
 /**
  * Remove gateway.controlUi.root when it does not point at a built Control UI (broken embed + black browser tab).
+ * Packaged local installs: always drop `controlUi.root` so the gateway serves Control UI from bundled OpenClaw cwd only
+ * (avoids stale absolute paths and index.html vs assets mismatch after reinstall or mixed artifacts).
  */
 function migrateInvalidGatewayControlUiRoot(config: OpenClawConfig): { config: OpenClawConfig; changed: boolean } {
   const gw = config.gateway
@@ -219,6 +222,15 @@ function migrateInvalidGatewayControlUiRoot(config: OpenClawConfig): { config: O
   if (!ctrl || typeof ctrl !== 'object' || Array.isArray(ctrl)) return { config, changed: false }
   const rootRaw = (ctrl as Record<string, unknown>).root
   if (typeof rootRaw !== 'string' || !rootRaw.trim()) return { config, changed: false }
+
+  if (app.isPackaged && gw.mode !== 'remote') {
+    const next = JSON.parse(JSON.stringify(config)) as OpenClawConfig
+    const ng = next.gateway?.controlUi as Record<string, unknown> | undefined
+    if (ng && typeof ng === 'object' && !Array.isArray(ng)) {
+      delete ng.root
+    }
+    return { config: next, changed: true }
+  }
 
   let dir: string
   try {
@@ -296,7 +308,7 @@ export function readOpenClawConfig(): OpenClawConfig {
           }
           if (migratedControlUiRoot.changed) {
             console.info(
-              '[config] Removed non-bundled/invalid gateway.controlUi.root in openclaw.json (use bundled Control UI auto-detection)',
+              '[config] Adjusted gateway.controlUi.root so Control UI loads from the bundled OpenClaw tree (avoids stale paths / black screen).',
             )
           }
           if (migratedControlUi.changed) {

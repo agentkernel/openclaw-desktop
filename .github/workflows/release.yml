@@ -177,6 +177,15 @@ jobs:
           name: openclaw-control-ui-dist
           path: build/openclaw/dist/control-ui
 
+      - name: Assert merged Control UI layout
+        shell: pwsh
+        run: |
+          $idx = Join-Path "build/openclaw/dist/control-ui" "index.html"
+          if (-not (Test-Path -LiteralPath $idx)) {
+            Write-Error "Control UI artifact merge failed: missing $idx (check upload/download paths)."
+            exit 1
+          }
+
       - name: Prepare bundle
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -258,7 +267,8 @@ jobs:
     needs:
       - package_win
       - sign_path
-    if: ${{ always() && needs.package_win.result == 'success' }}
+    # sign_path is skipped when USE_SIGNPATH≠true; without `skipped`, this job would never run.
+    if: ${{ always() && needs.package_win.result == 'success' && (needs.sign_path.result == 'success' || needs.sign_path.result == 'skipped') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

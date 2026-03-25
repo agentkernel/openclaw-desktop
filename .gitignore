@@ -6,18 +6,44 @@ build/*
 resources/node/
 resources/openclaw/
 .DS_Store
+Thumbs.db
 *.log
 .env
 .env.local
 certs/
 *.local
 
-# Maintainer-only local guide (not published on GitHub)
+# Maintainer-only / local docs (not published on GitHub)
 GitHub-guide.md
+INSTALLER_BLACKSCREEN_POSTMORTEM.zh-CN.md
+docs/
+
+# Scratch & temp
+tmp/
+temp/
+.temp/
+
+# IDE & local agent tooling
+.vscode/
+.idea/
+.claude/
+.cursor/
 
 # Development reference code (not part of the project)
 openclaw-main/
 .temp-openclaw/
 cobrain/
-.claude/
 dist-backup/
+
+# Caches & tooling artifacts
+*.tsbuildinfo
+.eslintcache
+coverage/
+pnpm-debug.log*
+.turbo/
+.parcel-cache/
+.cache/
+
+# OS / editor swap
+*.swp
+*~

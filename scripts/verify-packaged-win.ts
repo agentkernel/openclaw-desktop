@@ -9,6 +9,7 @@
 import { access, readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
+import { verifyControlUiBundle } from './lib/control-ui-verify.ts'
 
 const require = createRequire(import.meta.url)
 const { extractFile } = require('@electron/asar') as {
@@ -29,32 +30,6 @@ async function exists(p: string): Promise<boolean> {
 
 async function readJson<T>(p: string): Promise<T> {
   return JSON.parse(await readFile(p, 'utf8')) as T
-}
-
-function resolveControlUiRef(controlUiRoot: string, ref: string): string {
-  const s = ref.trim()
-  if (s.startsWith('/')) {
-    return join(controlUiRoot, s.replace(/^\//, ''))
-  }
-  return join(controlUiRoot, s.replace(/^\.\//, ''))
-}
-
-function collectRefsFromHtml(html: string): string[] {
-  const refs: string[] = []
-  const scriptRe = /<script[^>]+src=["']([^"']+)["']/gi
-  const preloadRe = /<link[^>]+rel=["']modulepreload["'][^>]+href=["']([^"']+)["']/gi
-  const preloadRe2 = /<link[^>]+href=["']([^"']+)["'][^>]+rel=["']modulepreload["']/gi
-  let m: RegExpExecArray | null
-  while ((m = scriptRe.exec(html))) {
-    refs.push(m[1])
-  }
-  while ((m = preloadRe.exec(html))) {
-    refs.push(m[1])
-  }
-  while ((m = preloadRe2.exec(html))) {
-    refs.push(m[1])
-  }
-  return refs
 }
 
 async function main(): Promise<void> {
@@ -146,23 +121,8 @@ async function main(): Promise<void> {
     'dist',
     'control-ui',
   )
-  const indexHtml = join(controlUiRoot, 'index.html')
-  if (!(await exists(indexHtml))) {
-    throw new Error(`Missing ${indexHtml}`)
-  }
-  const html = await readFile(indexHtml, 'utf8')
-  const refs = collectRefsFromHtml(html)
-  if (refs.length === 0) {
-    throw new Error('control-ui/index.html has no script src / modulepreload href')
-  }
-  for (const ref of refs) {
-    if (/^(https?:|data:)/i.test(ref)) continue
-    const abs = resolveControlUiRef(controlUiRoot, ref)
-    if (!(await exists(abs))) {
-      throw new Error(`control-ui index references missing file: ${ref} → ${abs}`)
-    }
-  }
-  console.log(`  [ok] control-ui index.html → ${refs.length} local asset ref(s) resolved`)
+  await verifyControlUiBundle(controlUiRoot)
+  console.log('  [ok] control-ui bundle (refs + JS syntax)')
 
   console.log('\n  OK: packaged win-unpacked consistency check passed\n')
 }

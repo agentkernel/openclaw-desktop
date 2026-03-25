@@ -7,6 +7,7 @@ import { mkdir, rm, access, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { execSync } from 'node:child_process'
 import { downloadAndBuildOpenClawControlUiAt } from './ensure-openclaw-control-ui.ts'
+import { verifyControlUiBundle } from './lib/control-ui-verify.ts'
 
 const OUT_ROOT = join(process.cwd(), 'build', '_ci_openclaw_control_ui_root')
 
@@ -46,12 +47,14 @@ async function main(): Promise<void> {
 
   await downloadAndBuildOpenClawControlUiAt(OUT_ROOT, version)
 
-  const indexHtml = join(OUT_ROOT, 'dist', 'control-ui', 'index.html')
+  const controlUiRoot = join(OUT_ROOT, 'dist', 'control-ui')
+  const indexHtml = join(controlUiRoot, 'index.html')
   if (!(await fileExists(indexHtml))) {
     throw new Error(`Expected ${indexHtml} after build`)
   }
+  await verifyControlUiBundle(controlUiRoot)
 
-  console.log(`\n  OK: Control UI at ${join(OUT_ROOT, 'dist', 'control-ui')}\n`)
+  console.log(`\n  OK: Control UI at ${controlUiRoot}\n`)
 }
 
 main().catch((err) => {

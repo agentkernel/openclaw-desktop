@@ -22,9 +22,36 @@ function readEntryPath(openclawDir: string): string | null {
   return null
 }
 
+function collectControlUiRefsFromHtml(html: string): string[] {
+  const refs: string[] = []
+  const scriptRe = /<script[^>]+src=["']([^"']+)["']/gi
+  const preloadRe = /<link[^>]+rel=["']modulepreload["'][^>]+href=["']([^"']+)["']/gi
+  const preloadRe2 = /<link[^>]+href=["']([^"']+)["'][^>]+rel=["']modulepreload["']/gi
+  let m: RegExpExecArray | null
+  while ((m = scriptRe.exec(html))) {
+    refs.push(m[1])
+  }
+  while ((m = preloadRe.exec(html))) {
+    refs.push(m[1])
+  }
+  while ((m = preloadRe2.exec(html))) {
+    refs.push(m[1])
+  }
+  return [...new Set(refs)]
+}
+
+function resolveControlUiRef(controlUiRoot: string, ref: string): string {
+  const s = ref.trim()
+  if (s.startsWith('/')) {
+    return path.join(controlUiRoot, s.replace(/^\//, ''))
+  }
+  return path.join(controlUiRoot, s.replace(/^\.\//, ''))
+}
+
 function validateControlUiBundle(openclawDir: string): string[] {
   const missing: string[] = []
-  const indexPath = path.join(openclawDir, 'dist', 'control-ui', 'index.html')
+  const controlUiRoot = path.join(openclawDir, 'dist', 'control-ui')
+  const indexPath = path.join(controlUiRoot, 'index.html')
   if (!fileExists(indexPath)) {
     missing.push('dist/control-ui/index.html')
     return missing
@@ -32,15 +59,16 @@ function validateControlUiBundle(openclawDir: string): string[] {
 
   try {
     const html = fs.readFileSync(indexPath, 'utf-8')
-    const scriptMatch = html.match(/<script[^>]+type=["']module["'][^>]+src=["']([^"']+)["']/i)
-    if (!scriptMatch || !scriptMatch[1]) {
-      missing.push('dist/control-ui/assets/index-*.js (not referenced)')
+    const refs = collectControlUiRefsFromHtml(html).filter((r) => r && !/^(https?:|data:)/i.test(r))
+    if (refs.length === 0) {
+      missing.push('dist/control-ui/index.html (no local script/modulepreload refs)')
       return missing
     }
-    const rel = scriptMatch[1].replace(/^\.\//, '')
-    const scriptPath = path.join(openclawDir, 'dist', 'control-ui', rel)
-    if (!fileExists(scriptPath)) {
-      missing.push(`dist/control-ui/${rel}`)
+    for (const ref of refs) {
+      const abs = resolveControlUiRef(controlUiRoot, ref)
+      if (!fileExists(abs)) {
+        missing.push(path.relative(openclawDir, abs).replace(/\\/g, '/'))
+      }
     }
   } catch {
     missing.push('dist/control-ui/index.html (read failed)')
