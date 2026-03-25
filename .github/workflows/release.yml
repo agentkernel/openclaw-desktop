@@ -17,6 +17,8 @@ concurrency:
 
 env:
   NODE_VERSION_CI: '22.16.0'
+  # check-openclaw-versions: validate pin vs bundle-manifest only (no npm registry query / latest warn).
+  OPENCLAW_SKIP_NPM_LATEST_CHECK: '1'
 
 jobs:
   build_control_ui:
@@ -97,6 +99,10 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      # Validates package.json pin vs bundle-manifest; pin need not equal npm openclaw@latest.
+      - name: Check OpenClaw version consistency (pin vs bundle-manifest)
+        run: pnpm run check-openclaw-versions
+
   package_win:
     name: Package Windows Installer
     needs:
@@ -175,6 +181,10 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: pnpm run prepare-bundle
+
+      # Validates on-disk bundles vs package.json `openclawBundleVersion` + bundle-manifest (not npm latest).
+      - name: Verify resource versions (Node, OpenClaw, project pin)
+        run: pnpm run verify-resource-versions
 
       - name: Package Windows installer
         run: pnpm run package:win

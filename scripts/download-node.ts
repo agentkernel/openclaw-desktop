@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import { execSync } from 'node:child_process'
 import AdmZip from 'adm-zip'
 
+/** Keep in sync with scripts/check-openclaw-versions.ts BUNDLED_NODE_VERSION and release.yml NODE_VERSION_CI */
 const DEFAULT_VERSION = '22.16.0'
 const NODE_DIST_URL = 'https://nodejs.org/dist'
 const BUILD_DIR = join(process.cwd(), 'build')

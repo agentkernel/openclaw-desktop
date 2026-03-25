@@ -2,6 +2,20 @@
 
 All notable changes to OpenClaw Desktop will be documented in this file.
 
+## [0.2.18] - 2026-03-25
+
+### Changed
+
+- **Release CI:** Workflow sets `OPENCLAW_SKIP_NPM_LATEST_CHECK=1` so `check-openclaw-versions` validates the committed pin + `bundle-manifest` + on-disk artifacts without querying or warning against npm `openclaw@latest`.
+
+### Documentation
+
+- **README.md / README.zh-CN.md:** Describe pinned OpenClaw (`openclawBundleVersion`), current bundle `2026.3.23-2`, and the CI/version-check behavior; align installer filename and download table with **v0.2.18**.
+
+### Added
+
+- **`scripts/check-openclaw-versions.ts`:** `--skip-npm-latest-check` and `OPENCLAW_SKIP_NPM_LATEST_CHECK` to skip the npm registry latest comparison (used by Release CI).
+
 ## [0.2.17] - 2026-03-25
 
 ### Added

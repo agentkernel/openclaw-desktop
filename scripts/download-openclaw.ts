@@ -139,30 +139,40 @@ async function main(): Promise<void> {
   if (await fileExists(markerPath)) {
     const installed = (await readFile(markerPath, 'utf8')).trim()
     if (installed === version) {
-      const commanderMismatch = await needsCommanderFix(OPENCLAW_DIR)
-      const hasControlUi = await fileExists(controlUiIndex)
-      if (!commanderMismatch && hasControlUi) {
+      const entryJs = join(OPENCLAW_DIR, 'dist', 'entry.js')
+      const entryMjs = join(OPENCLAW_DIR, 'dist', 'entry.mjs')
+      const hasCoreDist =
+        (await fileExists(entryJs)) || (await fileExists(entryMjs))
+      if (!hasCoreDist) {
         console.log(
-          `  [skip] OpenClaw ${version} already present at ${OPENCLAW_DIR}`,
+          `  [info] OpenClaw ${version} marker present but core dist missing — re-installing`,
         )
-        return
-      }
-      if (!commanderMismatch && !hasControlUi) {
-        if (skipControlUiBuild()) {
+      } else {
+        const commanderMismatch = await needsCommanderFix(OPENCLAW_DIR)
+        const hasControlUi = await fileExists(controlUiIndex)
+        if (!commanderMismatch && hasControlUi) {
           console.log(
-            '  [skip] dist/control-ui missing — OPENCLAW_SKIP_CONTROL_UI_BUILD=1 (merge artifact before prepare-bundle)',
+            `  [skip] OpenClaw ${version} already present at ${OPENCLAW_DIR}`,
           )
           return
         }
+        if (!commanderMismatch && !hasControlUi) {
+          if (skipControlUiBuild()) {
+            console.log(
+              '  [skip] dist/control-ui missing — OPENCLAW_SKIP_CONTROL_UI_BUILD=1 (merge artifact before prepare-bundle)',
+            )
+            return
+          }
+          console.log(
+            '  [info] dist/control-ui missing — building from GitHub sources for this version...',
+          )
+          await ensureOpenClawControlUiBuilt(OPENCLAW_DIR, version)
+          return
+        }
         console.log(
-          '  [info] dist/control-ui missing — building from GitHub sources for this version...',
+          `  [info] OpenClaw ${version} present but commander version mismatch — re-installing`,
         )
-        await ensureOpenClawControlUiBuilt(OPENCLAW_DIR, version)
-        return
       }
-      console.log(
-        `  [info] OpenClaw ${version} present but commander version mismatch — re-installing`,
-      )
     } else {
       console.log(`  [info] Found ${installed}, need ${version} — re-installing`)
     }
