@@ -56,7 +56,7 @@ If you've been searching for *how to install OpenClaw on Windows*, *how to run O
 
 ## What's New in v0.3.0
 
-- **Embedded Control UI:** The shell waits for a WebSocket **operator** handshake before mounting the gateway dashboard iframe, keeping the **Gateway starting** loading state until the console session is ready—no flash of the gateway key / bootstrap UI.
+- **Embedded Control UI:** The shell mounts the gateway dashboard iframe as soon as the gateway is running and the local control URL (including `#token=` when configured) is ready—reliable entry to the console without a main-process WebSocket pre-check that could fail on some gateway builds.
 
 Earlier highlights (v0.2.22): Lit + Electron Control UI build patches — see [CHANGELOG.md](CHANGELOG.md).
 

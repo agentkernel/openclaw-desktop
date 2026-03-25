@@ -17,9 +17,6 @@ export const IPC_GATEWAY_RESTART = 'gateway:restart' as const
 /** Gateway status query */
 export const IPC_GATEWAY_STATUS = 'gateway:status' as const
 
-/** WebSocket operator handshake probe (Control UI session readiness) */
-export const IPC_GATEWAY_PROBE_OPERATOR = 'gateway:probeOperator' as const
-
 /** Read OpenClaw config */
 export const IPC_CONFIG_READ = 'config:read' as const
 
@@ -219,7 +216,6 @@ export const IPC_INVOKE_CHANNELS = [
   IPC_GATEWAY_STOP,
   IPC_GATEWAY_RESTART,
   IPC_GATEWAY_STATUS,
-  IPC_GATEWAY_PROBE_OPERATOR,
   IPC_CONFIG_READ,
   IPC_CONFIG_WRITE,
   IPC_CONFIG_EXISTS,

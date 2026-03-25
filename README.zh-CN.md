@@ -56,7 +56,7 @@
 
 ## v0.3.0 更新亮点
 
-- **内嵌 Control UI：** 壳在挂载网关控制台 iframe 之前会等待 WebSocket **操作员**握手完成，在会话真正就绪前保持「网关启动中」加载态，避免短暂出现配置网关密钥等中间页。
+- **内嵌 Control UI：** 网关进入 running 且本地控制台 URL（含已配置的 `#token=`）就绪后即挂载 iframe；不再依赖主进程 WebSocket 预检，避免部分网关版本上预检失败导致一直停在「启动中」。
 
 更早版本（v0.2.22）要点：Lit + Electron 下 Control UI 构建补丁 — 详见 [CHANGELOG.md](CHANGELOG.md)。
 

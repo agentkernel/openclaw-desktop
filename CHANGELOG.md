@@ -6,9 +6,7 @@ All notable changes to OpenClaw Desktop will be documented in this file.
 
 ### Fixed
 
-- **Embedded Control UI:** After the gateway reports HTTP/TCP ready, the shell now waits for a successful WebSocket **operator** handshake (`gateway:probeOperator` IPC) before mounting the Control UI iframe. The loading screen stays on **Gateway starting** until then, avoiding a flash of the gateway key / bootstrap UI before the real console appears.
-- **Operator probe polling:** Clear the retry interval once the handshake succeeds so the shell does not keep opening and closing WebSocket connections (stops repeated `[ws] closed before connect` warnings and extra load on the gateway).
-- **Operator probe IPC:** Use a single connect attempt per poll (`maxRetries: 0`) and **serialize** overlapping probe calls in the renderer so long multi-retry connects do not stack with the next tick.
+- **Embedded Control UI:** Removed the WebSocket **operator pre-probe** (`gateway:probeOperator`) that blocked the main iframe until a main-process RPC connect succeeded. On some gateway builds the probe never completed (repeated `[ws] closed before connect` / code 1005) while the browser Control UI could still connect, which left the shell stuck on **Gateway starting**. The shell again mounts the Control UI iframe as soon as the gateway is **running** and the control URL (with token hash) is known—same as pre-0.3.0 behavior, so the console always loads.
 
 ## [0.2.22] - 2026-03-25
 
