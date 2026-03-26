@@ -8,6 +8,7 @@ import { DEFAULT_GATEWAY_PORT } from '../../shared/constants.js'
 import { getBundledNodePath, getBundledOpenClawDir, getBundledOpenClawPath, getUserDataDir } from '../utils/paths.js'
 import { OPENCLAW_CONFIG_FILE } from '../../shared/constants.js'
 import { logInfo, logWarn } from '../utils/logger.js'
+import { readOpenClawConfig } from '../config/index.js'
 
 export interface GatewayLaunchOptions {
   port?: number
@@ -268,6 +269,9 @@ export class GatewayProcessManager {
       this.emitLog('stderr', `[gateway] ${message}`)
       throw error
     }
+
+    // Migrate and persist openclaw.json before the child reads OPENCLAW_CONFIG_PATH (e.g. MiniMax `authHeader`).
+    void readOpenClawConfig()
 
     const port = options.port ?? DEFAULT_GATEWAY_PORT
     this.currentPort = port

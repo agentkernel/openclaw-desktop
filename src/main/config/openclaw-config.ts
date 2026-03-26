@@ -216,8 +216,9 @@ function migrateAnthropicThirdPartyAuthHeader(
 }
 
 /**
- * Earlier desktop migrations set `authHeader: true` for all third-party anthropic-messages hosts including MiniMax.
- * MiniMax requires Anthropic-style `x-api-key` (docs: ANTHROPIC_API_KEY + base https://api.minimax.io/anthropic). Flip to false.
+ * MiniMax Anthropic-compatible API expects **`x-api-key`**, not Bearer. Earlier seeds/migrations may set
+ * `authHeader: true`, and the gateway may rewrite the file without this field — persist **`false` explicitly**
+ * whenever it is not already `false` so the bundled gateway reads the correct transport on startup.
  */
 function migrateMinimaxAuthHeaderToXApiKey(
   config: OpenClawConfig,
@@ -236,11 +237,11 @@ function migrateMinimaxAuthHeaderToXApiKey(
   for (const [providerId, raw] of Object.entries(nextProviders)) {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue
     const p = raw as Record<string, unknown>
-    if (p.authHeader !== true) continue
     const api = typeof p.api === 'string' ? p.api : ''
     if (api !== 'anthropic-messages') continue
     const baseUrl = typeof p.baseUrl === 'string' ? p.baseUrl : ''
     if (!isMinimaxAnthropicProvider(providerId, baseUrl)) continue
+    if (p.authHeader === false) continue
     p.authHeader = false
     changed = true
   }
