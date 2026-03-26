@@ -1,4 +1,4 @@
 {
-  "shellVersion": "0.3.4",
-  "bundledOpenClawVersion": "2026.3.23-2"
+  "shellVersion": "0.4.0+openclaw.2026.3.24",
+  "bundledOpenClawVersion": "2026.3.24"
 }

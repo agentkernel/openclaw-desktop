@@ -1,7 +1,7 @@
 {
   "name": "openclaw-desktop",
-  "version": "0.3.4",
-  "openclawBundleVersion": "2026.3.23-2",
+  "version": "0.4.0+openclaw.2026.3.24",
+  "openclawBundleVersion": "2026.3.24",
   "description": "Community-maintained Windows desktop app and installer for OpenClaw.",
   "type": "module",
   "main": "out/main/index.js",
