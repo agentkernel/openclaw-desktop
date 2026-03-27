@@ -1,9 +1,24 @@
 import { app, ipcMain, shell } from 'electron'
 import type { GatewayProcessManager } from '../gateway/index.js'
-import type { OpenClawConfig, ShellConfig, AppVersionInfo, ModelConfig, WizardState } from '../../shared/types.js'
+import type {
+  OpenClawConfig,
+  ShellConfig,
+  AppVersionInfo,
+  ModelConfig,
+  WizardState,
+  ModelSettingsApplyResult,
+  ModelSettingsLoadResult,
+} from '../../shared/types.js'
 import type { PortCheckResult } from '../utils/port-check.js'
 import { testModelConnection } from '../wizard/model-tester.js'
-import { handleWizardCompleteSetup } from '../wizard/setup-handler.js'
+import {
+  handleWizardCompleteSetup,
+  mergeModelIntoOpenClawConfig,
+  sanitizeWizardState,
+  writeAuthCredentialsForModelState,
+  type ModelSettingsTarget,
+} from '../wizard/setup-handler.js'
+import { inferModelConfigFromOpenClaw, listAgentSummariesFromConfig } from '../wizard/model-settings-load.js'
 import { DEFAULT_GATEWAY_PORT } from '../../shared/constants.js'
 import {
   IPC_GATEWAY_START,
@@ -35,6 +50,8 @@ import {
   IPC_PROVIDERS_IMPORT,
   IPC_PROVIDERS_SAVE_CONFIG,
   IPC_PROVIDERS_SET_MODEL_DEFAULTS,
+  IPC_MODEL_SETTINGS_LOAD,
+  IPC_MODEL_SETTINGS_APPLY,
   IPC_SKILLS_LIST,
   IPC_SKILLS_TOGGLE,
   IPC_SKILLS_RELOAD,
@@ -198,6 +215,46 @@ function validatePlainObject(value: unknown, label: string): Record<string, unkn
     throw new Error(`${label} must be a non-null object`)
   }
   return value as Record<string, unknown>
+}
+
+function parseModelConfigPayload(raw: Record<string, unknown>): ModelConfig {
+  return {
+    provider: raw.provider as ModelConfig['provider'],
+    apiKey: String(raw.apiKey ?? ''),
+    modelId: String(raw.modelId ?? ''),
+    moonshotRegion: raw.moonshotRegion === 'cn' ? 'cn' : raw.moonshotRegion === 'global' ? 'global' : undefined,
+    customProviderId: typeof raw.customProviderId === 'string' ? raw.customProviderId : undefined,
+    customBaseUrl: typeof raw.customBaseUrl === 'string' ? raw.customBaseUrl : undefined,
+    cloudflareAccountId: typeof raw.cloudflareAccountId === 'string' ? raw.cloudflareAccountId : undefined,
+    cloudflareGatewayId: typeof raw.cloudflareGatewayId === 'string' ? raw.cloudflareGatewayId : undefined,
+    customCompatibility:
+      raw.customCompatibility === 'anthropic'
+        ? 'anthropic'
+        : raw.customCompatibility === 'openai'
+          ? 'openai'
+          : undefined,
+  }
+}
+
+function wizardStateForModelConfig(modelConfig: ModelConfig): WizardState {
+  return {
+    currentStep: 0,
+    modelConfig,
+    channelConfig: {
+      feishu: null,
+      telegram: null,
+      discord: null,
+      slack: null,
+      whatsapp: null,
+      selectedChannel: 'whatsapp',
+      skipChannels: true,
+    },
+    gatewayConfig: {
+      port: 18789,
+      bind: 'loopback',
+      authToken: '',
+    },
+  }
 }
 
 export function registerIpcHandlers(deps: IpcHandlerDeps): void {
@@ -574,6 +631,106 @@ export function registerIpcHandlers(deps: IpcHandlerDeps): void {
     }),
   )
 
+  ipcMain.handle(
+    IPC_MODEL_SETTINGS_LOAD,
+    wrapHandler('MODEL_SETTINGS_LOAD', (): ModelSettingsLoadResult => {
+      if (!deps.openclawConfigExists()) {
+        return {
+          hasConfig: false,
+          modelConfig: inferModelConfigFromOpenClaw({}),
+          agents: [],
+        }
+      }
+      const config = deps.readOpenClawConfig() ?? {}
+      const dm = config.agents?.defaults?.model
+      const defaultPrimaryDisplay =
+        typeof dm === 'string' ? dm : dm && typeof dm === 'object' ? (dm as { primary?: string }).primary : undefined
+      return {
+        hasConfig: true,
+        modelConfig: inferModelConfigFromOpenClaw(config),
+        agents: listAgentSummariesFromConfig(config),
+        defaultPrimaryDisplay,
+      }
+    }),
+  )
+
+  ipcMain.handle(
+    IPC_MODEL_SETTINGS_APPLY,
+    wrapHandler('MODEL_SETTINGS_APPLY', async (payload: unknown): Promise<ModelSettingsApplyResult> => {
+      const raw = validatePlainObject(payload, 'modelSettingsApply')
+      const restartGateway = raw.restartGateway === true
+      const modelRaw = validatePlainObject(raw.modelConfig, 'modelConfig')
+      const cfg = parseModelConfigPayload(modelRaw)
+      if (!cfg.modelId.trim()) {
+        throw new Error('modelId is required')
+      }
+      if (cfg.provider === 'custom') {
+        if (!cfg.customProviderId?.trim() || !cfg.customBaseUrl?.trim()) {
+          throw new Error('Custom provider requires provider ID and API base URL')
+        }
+      }
+      if (cfg.provider === 'cloudflare-ai-gateway') {
+        if (!cfg.cloudflareAccountId?.trim() || !cfg.cloudflareGatewayId?.trim()) {
+          throw new Error('Cloudflare AI Gateway requires Account ID and Gateway ID')
+        }
+      }
+      const targetRaw = raw.target
+      if (!targetRaw || typeof targetRaw !== 'object' || Array.isArray(targetRaw)) {
+        throw new Error('target is required')
+      }
+      const tr = targetRaw as Record<string, unknown>
+      let target: ModelSettingsTarget
+      if (tr.kind === 'defaults') {
+        target = { kind: 'defaults' }
+      } else if (tr.kind === 'agent' && typeof tr.agentId === 'string' && tr.agentId.trim()) {
+        target = { kind: 'agent', agentId: tr.agentId.trim() }
+      } else {
+        throw new Error('target must be { kind: "defaults" } or { kind: "agent", agentId }')
+      }
+
+      const state = wizardStateForModelConfig(cfg)
+      const base = deps.readOpenClawConfig() ?? {}
+      const merged = mergeModelIntoOpenClawConfig(base, state, target)
+      deps.writeOpenClawConfig(merged)
+      readOpenClawConfig()
+
+      const sanitized = sanitizeWizardState(state)
+      const cred = writeAuthCredentialsForModelState(sanitized)
+      if (!cred.ok) {
+        throw new Error(cred.error)
+      }
+
+      const validationResult = await runConfigValidate()
+      const isEnvLimit = validationResult.issues.some(
+        (i) =>
+          i.path.startsWith('__') &&
+          (i.path.includes('bundle') || i.path.includes('spawn') || i.path.includes('timeout')),
+      )
+      const validationIssues =
+        !validationResult.valid && !isEnvLimit
+          ? validationResult.issues.map((i) => ({ path: i.path, message: i.message }))
+          : undefined
+
+      let restarted = false
+      if (restartGateway) {
+        const gwCfg = deps.readOpenClawConfig()
+        const gw = gwCfg?.gateway
+        const port = gw?.port ?? DEFAULT_GATEWAY_PORT
+        const bind = gw?.bind ?? 'loopback'
+        const token = gw?.auth?.token?.trim()
+        const force = Boolean(gw?.forcePortOnConflict)
+        await gatewayManager.restart({ port, bind, token: token || undefined, force })
+        restarted = true
+      }
+
+      return {
+        ok: true,
+        restarted,
+        ...(validationIssues && validationIssues.length ? { validationIssues } : {}),
+      }
+    }),
+  )
+
   // ─── Registry (Skills / Extensions / Commands) ───────────────────────────
   const registryDeps = {
     getBundledOpenClawPath: deps.getBundledOpenClawPath ?? (() => ''),
@@ -936,6 +1093,8 @@ export function removeIpcHandlers(): void {
   ipcMain.removeHandler(IPC_PROVIDERS_IMPORT)
   ipcMain.removeHandler(IPC_PROVIDERS_SAVE_CONFIG)
   ipcMain.removeHandler(IPC_PROVIDERS_SET_MODEL_DEFAULTS)
+  ipcMain.removeHandler(IPC_MODEL_SETTINGS_LOAD)
+  ipcMain.removeHandler(IPC_MODEL_SETTINGS_APPLY)
   ipcMain.removeHandler(IPC_SKILLS_LIST)
   ipcMain.removeHandler(IPC_SKILLS_TOGGLE)
   ipcMain.removeHandler(IPC_SKILLS_RELOAD)

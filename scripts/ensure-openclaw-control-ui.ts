@@ -12,7 +12,7 @@
  * so the UI runs inside Electron without changing upstream OpenClaw sources.
  */
 
-import { createWriteStream } from 'node:fs'
+import { createWriteStream, existsSync } from 'node:fs'
 import {
   mkdir,
   rm,
@@ -84,6 +84,54 @@ function curlOnPath(): boolean {
   } catch {
     return false
   }
+}
+
+/**
+ * Windows `System32\\tar.exe` (bsdtar) often fails extracting GitHub tarballs (e.g. docs paths).
+ * Prefer Git for Windows GNU tar, or `OPENCLAW_TAR_EXE` override.
+ */
+function resolveTarExecutable(): string {
+  const override = process.env.OPENCLAW_TAR_EXE?.trim()
+  if (override) return override
+  if (process.platform !== 'win32') return 'tar'
+  const candidates = [
+    'C:\\Program Files\\Git\\usr\\bin\\tar.exe',
+    'C:\\Program Files (x86)\\Git\\usr\\bin\\tar.exe',
+  ]
+  for (const p of candidates) {
+    if (existsSync(p)) return p
+  }
+  return 'tar'
+}
+
+/**
+ * Git for Windows `tar` runs in MSYS; drive-letter paths like `E:\...` break gzip (`Cannot connect to E: resolve failed`).
+ * Use `/e/...` style paths for that binary.
+ */
+function pathsForTarExe(tarExe: string, tgzPath: string, extractDir: string): { tgz: string; cwd: string } {
+  const tgz = resolve(tgzPath)
+  const cwd = resolve(extractDir)
+  if (process.platform !== 'win32') return { tgz, cwd }
+  if (!/\\git\\/i.test(tarExe)) return { tgz, cwd }
+  const toMsys = (abs: string) => {
+    const m = /^([a-zA-Z]):[/\\](.*)$/i.exec(abs)
+    if (!m) return abs.replace(/\\/g, '/')
+    return `/${m[1].toLowerCase()}/${m[2].replace(/\\/g, '/')}`
+  }
+  return { tgz: toMsys(tgz), cwd: toMsys(cwd) }
+}
+
+function extractTarGzToDir(tgzPath: string, extractDir: string): void {
+  const tarExe = resolveTarExecutable()
+  if (tarExe !== 'tar') {
+    console.log(`  [control-ui] using ${tarExe} for tarball extract`)
+  } else if (process.platform === 'win32') {
+    console.warn(
+      '  [warn] Git tar not found — using System32 tar (may fail on some archives). Install Git for Windows or set OPENCLAW_TAR_EXE.',
+    )
+  }
+  const { tgz, cwd } = pathsForTarExe(tarExe, tgzPath, extractDir)
+  execFileSync(tarExe, ['-xzf', tgz, '-C', cwd], { stdio: 'inherit' })
 }
 
 /**
@@ -260,7 +308,7 @@ export async function downloadAndBuildOpenClawControlUiAt(
   try {
     await downloadToFile(url, tgzPath)
     await mkdir(extractDir, { recursive: true })
-    execFileSync('tar', ['-xzf', tgzPath, '-C', extractDir], { stdio: 'inherit' })
+    extractTarGzToDir(tgzPath, extractDir)
 
     const srcRoot = await findExtractedRepoRoot(extractDir)
     const uiSrc = join(srcRoot, 'ui')

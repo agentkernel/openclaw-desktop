@@ -7,6 +7,7 @@
 import { cp, rm, readFile, writeFile, access, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { execSync } from 'node:child_process'
+import { patchOpenClawFeishuRegisterOnce } from './patch-openclaw-feishu-register-once.ts'
 
 const PROJECT_ROOT = process.cwd()
 const BUILD_DIR = join(PROJECT_ROOT, 'build')
@@ -180,6 +181,8 @@ async function main(): Promise<void> {
     )
   }
   console.log('  [ok] build/openclaw/node_modules found')
+
+  await patchOpenClawFeishuRegisterOnce(SRC_OPENCLAW)
 
   // --- Ensure resources directory exists ---
   await mkdir(RESOURCES_DIR, { recursive: true })

@@ -696,9 +696,10 @@ export class GatewayProcessManager {
   private emitLog(stream: 'stdout' | 'stderr', message: string): void {
     const now = Date.now()
     this.flushExpiredDedupSummaries(now)
-    if (this.isFeishuRegistrationLog(message)) {
+    const feishuRegKey = this.getFeishuRegistrationDedupKey(message)
+    if (feishuRegKey != null) {
       const normalized = this.normalizeLogForDedup(message)
-      const key = `${stream}|${normalized}`
+      const key = `${stream}|${feishuRegKey}`
       const prev = this.dedupState.get(key)
       if (prev && now - prev.lastSeen <= this.dedupWindowMs) {
         prev.lastSeen = now
@@ -736,9 +737,28 @@ export class GatewayProcessManager {
       .trim()
   }
 
-  private isFeishuRegistrationLog(message: string): boolean {
+  /**
+   * OpenClaw may log Feishu/Lark tool/plugin registration on many inbound paths (e.g. each message dispatch).
+   * Dedupe by a stable key so lines that differ only by ids/timestamps still collapse within {@link dedupWindowMs}.
+   */
+  private getFeishuRegistrationDedupKey(message: string): string | null {
     const normalized = this.normalizeLogForDedup(message)
-    return /\bfeishu_(doc|chat|wiki|drive|bitable)\b/i.test(normalized) && /\bRegistered\b/i.test(normalized)
+    if (!/\b(feishu|lark)\b/i.test(normalized)) return null
+    if (!/\b(registered|register|re-?registered|re-?register)\b/i.test(normalized)) return null
+    // feishu_* / lark_* tool ids, or generic plugin/dispatch paths (upstream wording varies by version).
+    if (
+      /\bfeishu_[\w]+\b/i.test(normalized)
+      || /\blark_[\w]+\b/i.test(normalized)
+      || /\bplugin\b/i.test(normalized)
+      || /\btool(s)?\b/i.test(normalized)
+      || /\bextension\b/i.test(normalized)
+      || /\bhandler\b/i.test(normalized)
+      || /\badapter\b/i.test(normalized)
+      || /\bdispatch(?:ed|ing)?\b/i.test(normalized)
+    ) {
+      return 'feishu-plugin-registration'
+    }
+    return null
   }
 
   private flushExpiredDedupSummaries(now: number): void {

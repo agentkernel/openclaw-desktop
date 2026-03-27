@@ -1,4 +1,5 @@
-import { app, dialog, Menu, Notification, session, screen } from 'electron'
+import { app, dialog, Menu, Notification, nativeImage, session, screen } from 'electron'
+import fs from 'node:fs'
 import path from 'node:path'
 import { IPC_GATEWAY_LOG, IPC_GATEWAY_STATUS_CHANGE, IPC_STREAM_GATEWAY_LOGS, IPC_UPDATE_AVAILABLE } from '../shared/ipc-channels.js'
 import { APP_NAME, DEFAULT_GATEWAY_PORT, OPENCLAW_CONFIG_FILE } from '../shared/constants.js'
@@ -16,6 +17,22 @@ import { TrayManager } from './tray/index.js'
 import { WindowManager } from './window/index.js'
 import { checkPort } from './utils/port-check.js'
 import { getUserDataDir, getInstallDir, getBundledOpenClawPath } from './utils/paths.js'
+
+/** Toast / Notification on Windows prefers an explicit icon next to AppUserModelId. */
+function resolveShellNotificationIconPath(): string | undefined {
+  const installDir = getInstallDir()
+  const candidates = [
+    path.join(installDir, 'resources', 'apple-touch-icon.png'),
+    path.join(installDir, 'resources', 'tray-icon.png'),
+    path.join(installDir, 'resources', 'icon.ico'),
+    path.join(installDir, 'build', 'tray-icon.png'),
+    path.join(installDir, 'build', 'icon.ico'),
+  ]
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p
+  }
+  return undefined
+}
 import { getAppVersions } from './utils/versions.js'
 import { initShellLog, logError, logInfo, logWarn } from './utils/logger.js'
 import { initAutoUpdater, runPostUpdateValidationIfNeeded, checkForUpdates } from './update/index.js'
@@ -41,6 +58,8 @@ process.on('uncaughtException', (error) => {
 })
 let isQuitting = false
 let stopFeishuPairingNotifyWatcher: (() => void) | null = null
+let feishuPairingPollTimer: ReturnType<typeof setInterval> | null = null
+let loggedFeishuPairingNotificationUnsupported = false
 const windowManager = new WindowManager({
   defaultGatewayPort: DEFAULT_GATEWAY_PORT,
   readShellConfig,
@@ -106,6 +125,10 @@ async function cleanupBeforeQuit(): Promise<void> {
   if (stopFeishuPairingNotifyWatcher) {
     stopFeishuPairingNotifyWatcher()
     stopFeishuPairingNotifyWatcher = null
+  }
+  if (feishuPairingPollTimer) {
+    clearInterval(feishuPairingPollTimer)
+    feishuPairingPollTimer = null
   }
 }
 
@@ -315,14 +338,10 @@ app.whenReady().then(() => {
    * stays the same — dedupe by openId so we do not spam duplicate system notifications.
    */
   const notifiedFeishuPairingOpenIds = new Set<string>()
-  /** When pending rows have no openId yet, only one notification per interval (rotating code / noisy state). */
-  let lastFeishuPairingNotifyWithoutOpenIdAt = 0
-  const FEISHU_PAIRING_NOTIFY_MIN_INTERVAL_MS = 120_000
 
   const processFeishuPairingNotifications = () => {
     void listPendingFeishuPairing()
       .then(({ requests }) => {
-        const now = Date.now()
         for (const row of requests) {
           const code = row.code.trim().toUpperCase()
           if (!code) continue
@@ -331,20 +350,32 @@ app.whenReady().then(() => {
             if (notifiedFeishuPairingOpenIds.has(openId)) continue
           } else {
             if (notifiedFeishuPairingCodes.has(code)) continue
-            if (now - lastFeishuPairingNotifyWithoutOpenIdAt < FEISHU_PAIRING_NOTIFY_MIN_INTERVAL_MS) continue
-            lastFeishuPairingNotifyWithoutOpenIdAt = now
           }
           notifiedFeishuPairingCodes.add(code)
           if (openId) notifiedFeishuPairingOpenIds.add(openId)
-          if (!Notification.isSupported()) continue
+          if (!Notification.isSupported()) {
+            if (!loggedFeishuPairingNotificationUnsupported) {
+              loggedFeishuPairingNotificationUnsupported = true
+              logWarn('[Feishu pairing] system notifications are not supported in this environment; use 飞书设置 to approve.')
+            }
+            continue
+          }
           const loc = resolveTrayLocale(readShellConfig)
           const notifCopy = getFeishuPairingNotificationStrings(loc)
+          const iconPath = resolveShellNotificationIconPath()
+          const icon = iconPath ? nativeImage.createFromPath(iconPath) : undefined
           const n = new Notification({
             title: notifCopy.title,
             body: formatFeishuPairingBody(notifCopy.bodyTemplate, row.code),
+            ...(icon && !icon.isEmpty() ? { icon } : {}),
           })
           n.on('click', () => {
             windowManager.showShellRoute('#feishu-settings')
+          })
+          n.on('failed', (_e, err) => {
+            logWarn(
+              `[Feishu pairing] native notification failed: ${err} (check OS notification settings for ${APP_NAME}).`,
+            )
           })
           n.show()
         }
@@ -353,6 +384,9 @@ app.whenReady().then(() => {
   }
   processFeishuPairingNotifications()
   stopFeishuPairingNotifyWatcher = watchFeishuPairingCredentialsDir(processFeishuPairingNotifications)
+  /** fs.watch on credentials can miss rapid writes on some Windows setups; poll as a safety net. */
+  const FEISHU_PAIRING_POLL_MS = 25_000
+  feishuPairingPollTimer = setInterval(() => processFeishuPairingNotifications(), FEISHU_PAIRING_POLL_MS)
 
   // 5. Pre-start checks (bundle + config)
   const prestartCheck = runPrestartCheck()

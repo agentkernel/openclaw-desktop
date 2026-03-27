@@ -34,6 +34,8 @@ import {
   IPC_PROVIDERS_IMPORT,
   IPC_PROVIDERS_SAVE_CONFIG,
   IPC_PROVIDERS_SET_MODEL_DEFAULTS,
+  IPC_MODEL_SETTINGS_LOAD,
+  IPC_MODEL_SETTINGS_APPLY,
   IPC_SKILLS_LIST,
   IPC_SKILLS_TOGGLE,
   IPC_SKILLS_RELOAD,
@@ -148,6 +150,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     invoke(IPC_PROVIDERS_SAVE_CONFIG, opts),
   providersSetModelDefaults: (opts: { primary?: string; fallbacks?: string[] }) =>
     invoke(IPC_PROVIDERS_SET_MODEL_DEFAULTS, opts ?? {}),
+
+  modelSettingsLoad: () => invoke(IPC_MODEL_SETTINGS_LOAD),
+  modelSettingsApply: (payload: unknown) => invoke(IPC_MODEL_SETTINGS_APPLY, payload),
 
   skillsList: (opts?: { source?: 'all' | 'bundled' | 'user' }) =>
     invoke(IPC_SKILLS_LIST, opts ?? {}),

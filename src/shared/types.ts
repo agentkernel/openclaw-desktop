@@ -108,9 +108,22 @@ export interface AgentDefaultsConfig {
   workspace?: string
 }
 
+/** Single agent entry (OpenClaw `agents.list[]`; multi-agent routing) */
+export interface AgentListEntry {
+  id: string
+  name?: string
+  workspace?: string
+  agentDir?: string
+  /** Upstream accepts `provider/model` string or structured model */
+  model?: string | AgentModelDefaults
+  [key: string]: unknown
+}
+
 /** Agents section */
 export interface AgentsConfig {
   defaults?: AgentDefaultsConfig
+  /** Optional multi-agent list (same shape as upstream `openclaw.json`) */
+  list?: AgentListEntry[]
 }
 
 /** Feishu (Lark) channel config */
@@ -325,6 +338,32 @@ export interface WizardCompleteResult {
   port?: number
   error?: string
   phase?: 'config' | 'auth' | 'gateway'
+}
+
+/** Settings → model editor: load snapshot */
+export interface ModelSettingsLoadResult {
+  hasConfig: boolean
+  modelConfig: ModelConfig
+  /** Extra agents from `agents.list` (for per-agent model target) */
+  agents: Array<{ id: string; name?: string; currentModel?: string }>
+  /** Resolved default primary for display */
+  defaultPrimaryDisplay?: string
+}
+
+/** Settings → model editor: apply payload */
+export interface ModelSettingsApplyPayload {
+  modelConfig: ModelConfig
+  target: { kind: 'defaults' } | { kind: 'agent'; agentId: string }
+  /** When true, restart Gateway after write so changes take effect immediately */
+  restartGateway: boolean
+}
+
+/** Settings → model editor: apply result */
+export interface ModelSettingsApplyResult {
+  ok: boolean
+  error?: string
+  restarted?: boolean
+  validationIssues?: Array<{ path: string; message: string }>
 }
 
 // ─── BundleManifest / AppVersionInfo ────────────────────────────────────────

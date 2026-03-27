@@ -10,6 +10,9 @@ import type {
   ModelProviderConfig,
   WizardState,
   WizardCompleteResult,
+  ModelSettingsLoadResult,
+  ModelSettingsApplyPayload,
+  ModelSettingsApplyResult,
   AppVersionInfo,
   SkillRegistryItem,
   ExtensionRegistryItem,
@@ -155,6 +158,9 @@ export interface ElectronAPI {
   providersImport: (json: string) => Promise<{ imported: number; errors: string[] }>
   providersSaveProviderConfig: (opts: { providerId: string; config: Partial<ModelProviderConfig> }) => Promise<void>
   providersSetModelDefaults: (opts: { primary?: string; fallbacks?: string[] }) => Promise<void>
+
+  modelSettingsLoad: () => Promise<ModelSettingsLoadResult>
+  modelSettingsApply: (payload: ModelSettingsApplyPayload) => Promise<ModelSettingsApplyResult>
 
   skillsList: (opts?: { source?: 'all' | 'bundled' | 'user' }) => Promise<SkillRegistryItem[]>
   skillsToggle: (opts: { skillKey: string; enabled: boolean }) => Promise<{ ok: boolean }>

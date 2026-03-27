@@ -4,6 +4,17 @@ All notable changes to OpenClaw Desktop will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.10] - 2026-03-27
+
+### Added
+
+- **设置 → 模型：** 新增「模型」区块，可从 `openclaw.json` 加载当前默认/按 Agent 的模型配置，编辑提供商、模型 ID、API Key（及 Moonshot 区域等），支持连接测试，并写回配置与 `auth-profiles`（与向导逻辑对齐）。
+- **打包：** 对随包 OpenClaw 飞书通道做 `registerFull` 一次性防护补丁（`patch-openclaw-feishu-register-once`），避免 `registrationMode: full` 下重复注册工具并刷屏日志。
+
+### Changed
+
+- **Release：** Shell `0.4.10+openclaw.2026.3.24`；`prepare-bundle` 后 `resources/bundle-manifest.json` 与 `package.json` 对齐。
+
 ## [0.4.9] - 2026-03-27
 
 ### Fixed

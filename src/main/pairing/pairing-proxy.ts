@@ -142,6 +142,7 @@ function normalizePendingRequest(entry: unknown): FeishuPairingRequest | null {
   if (!record) return null
 
   const sender = pickNestedRecord(record, ['sender', 'user', 'peer'])
+  const meta = pickNestedRecord(record, ['meta'])
   const code =
     coercePairingCode(pickString(record, ['code', 'pairingCode', 'pairing_code', 'challenge', 'token', 'pairing', 'value']))
     ?? coercePairingCode(
@@ -149,9 +150,27 @@ function normalizePendingRequest(entry: unknown): FeishuPairingRequest | null {
         ? pickString(sender, ['pairingCode', 'pairing_code', 'code', 'challenge', 'token'])
         : undefined,
     )
+    ?? coercePairingCode(meta ? pickString(meta, ['code', 'pairingCode', 'pairing_code', 'challenge']) : undefined)
+  /** OpenClaw pairing store uses top-level `id` for the sender id (e.g. Feishu open_id). */
   const openId =
-    pickString(record, ['openId', 'open_id', 'senderOpenId', 'sender_open_id', 'senderId', 'sender_id', 'peerId', 'peer_id'])
-    ?? (sender ? pickString(sender, ['openId', 'open_id', 'id', 'senderId', 'sender_id']) : undefined)
+    pickString(record, [
+      'openId',
+      'openid',
+      'open_id',
+      'senderOpenId',
+      'sender_open_id',
+      'senderId',
+      'sender_id',
+      'userId',
+      'user_id',
+      'peerId',
+      'peer_id',
+      'id',
+    ])
+    ?? (sender
+      ? pickString(sender, ['openId', 'openid', 'open_id', 'id', 'senderId', 'sender_id', 'userId', 'user_id'])
+      : undefined)
+    ?? (meta ? pickString(meta, ['openId', 'open_id', 'senderId', 'id']) : undefined)
   const displayName =
     pickString(record, ['displayName', 'display_name', 'senderName', 'sender_name', 'name'])
     ?? (sender ? pickString(sender, ['displayName', 'display_name', 'name']) : undefined)

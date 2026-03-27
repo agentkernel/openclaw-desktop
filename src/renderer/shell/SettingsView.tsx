@@ -17,6 +17,7 @@ import {
   type ShellLocale,
 } from '../i18n'
 import { normalizeToShellLocale } from '../../shared/shell-locale'
+import { ModelSettingsSection } from './ModelSettingsSection'
 
 export interface SettingsViewProps {
   /** Back navigation when embedded in parent layout */
@@ -175,7 +176,7 @@ export function SettingsView({ onBack, onOpenFeishuSettings }: SettingsViewProps
 
   return (
     <ShellLayout title={t('shell.settings.title')} onBack={handleBack}>
-      <div className="w-full max-w-md flex flex-col gap-8">
+      <div className="w-full max-w-2xl flex flex-col gap-8">
         <section className="flex flex-col gap-6" aria-label={t('shell.settings.generalSectionAria')}>
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-0.5">
@@ -281,6 +282,8 @@ export function SettingsView({ onBack, onOpenFeishuSettings }: SettingsViewProps
             </div>
           </div>
         </section>
+
+        <ModelSettingsSection />
 
         {onOpenFeishuSettings && (
           <section className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4" aria-label={t('shell.settings.feishuSection')}>

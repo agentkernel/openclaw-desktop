@@ -20,6 +20,7 @@ import {
   ensureOpenClawControlUiBuilt,
   CONTROL_UI_ELECTRON_LIT_MARKER,
 } from './ensure-openclaw-control-ui.ts'
+import { patchOpenClawFeishuRegisterOnce } from './patch-openclaw-feishu-register-once.ts'
 
 /** Fallback when package.json has no `openclawBundleVersion` (discouraged — pin in package.json). */
 const DEFAULT_VERSION = 'latest'
@@ -354,6 +355,8 @@ async function main(): Promise<void> {
   } else {
     await ensureOpenClawControlUiBuilt(OPENCLAW_DIR, actualVersion)
   }
+
+  await patchOpenClawFeishuRegisterOnce(OPENCLAW_DIR)
 
   console.log(`\n  OK: OpenClaw ${actualVersion} ready at ${OPENCLAW_DIR}\n`)
 }

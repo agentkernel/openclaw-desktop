@@ -92,6 +92,12 @@ export const IPC_PROVIDERS_SAVE_CONFIG = 'providers:saveProviderConfig' as const
 /** Providers: set default model / fallbacks */
 export const IPC_PROVIDERS_SET_MODEL_DEFAULTS = 'providers:setModelDefaults' as const
 
+/** Settings: load model editor snapshot (infer from openclaw.json) */
+export const IPC_MODEL_SETTINGS_LOAD = 'modelSettings:load' as const
+
+/** Settings: apply model editor (merge config + optional gateway restart) */
+export const IPC_MODEL_SETTINGS_APPLY = 'modelSettings:apply' as const
+
 /** Skills list */
 export const IPC_SKILLS_LIST = 'skills:list' as const
 

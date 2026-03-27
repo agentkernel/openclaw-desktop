@@ -9,12 +9,14 @@ import type {
   ShellConfig,
   ModelProviderConfig,
   ModelProvider,
+  AgentListEntry,
 } from '../../shared/types.js'
 import type { GatewayProcessManager } from '../gateway/index.js'
 import { writeAuthProfile, writeAuthProfileToken } from './auth-profile-writer.js'
 import { runConfigValidate, readOpenClawConfig } from '../config/index.js'
 import { getUserDataDir } from '../utils/paths.js'
 import path from 'node:path'
+import { addProfileToAuthOrder } from '../providers/provider-config.js'
 
 export interface WizardCompleteResult {
   ok: boolean
@@ -26,7 +28,7 @@ export interface WizardCompleteResult {
 }
 
 /** Trim pasted secrets / IDs so openclaw.json and auth-profiles match what the user intended. */
-function sanitizeWizardState(state: WizardState): WizardState {
+export function sanitizeWizardState(state: WizardState): WizardState {
   const mc = state.modelConfig
   const modelConfig: WizardState['modelConfig'] = {
     ...mc,
@@ -249,7 +251,8 @@ const PROVIDER_SEEDS: Partial<Record<ModelProvider, ProviderSeed>> = {
   },
 }
 
-const API_KEY_PROVIDER_SET = new Set<ModelProvider>([
+/** Providers that use API key auth profiles in wizard / model settings (exported for IPC). */
+export const API_KEY_PROVIDER_SET = new Set<ModelProvider>([
   'anthropic',
   'openai',
   'google',
@@ -310,7 +313,7 @@ function buildMoonshotProvider(baseUrl: string): ModelProviderConfig {
   }
 }
 
-function resolveAuthProviderId(provider: ModelProvider): string {
+export function resolveAuthProviderId(provider: ModelProvider): string {
   if (provider === 'moonshot-cn') return 'moonshot'
   return PROVIDER_SEEDS[provider]?.authProviderId ?? provider
 }
@@ -613,6 +616,195 @@ function buildOpenClawConfig(state: WizardState): OpenClawConfig {
   return config
 }
 
+/**
+ * Persist API keys / tokens for a wizard model selection (auth-profiles store).
+ * Call after `writeOpenClawConfig` when the user supplied a new key.
+ */
+export function writeAuthCredentialsForModelState(sanitized: WizardState): {
+  ok: true
+} | {
+  ok: false
+  error: string
+} {
+  if (
+    sanitized.modelConfig.provider !== 'custom' &&
+    (API_KEY_PROVIDER_SET.has(sanitized.modelConfig.provider) ||
+      sanitized.modelConfig.provider === 'moonshot-cn') &&
+    sanitized.modelConfig.apiKey.trim()
+  ) {
+    try {
+      const provider = resolveAuthProviderId(sanitized.modelConfig.provider)
+      const profileName = sanitized.modelConfig.provider === 'minimax' ? 'global' : 'default'
+      const metadata =
+        sanitized.modelConfig.provider === 'cloudflare-ai-gateway' &&
+        sanitized.modelConfig.cloudflareAccountId?.trim() &&
+        sanitized.modelConfig.cloudflareGatewayId?.trim()
+          ? {
+              accountId: sanitized.modelConfig.cloudflareAccountId.trim(),
+              gatewayId: sanitized.modelConfig.cloudflareGatewayId.trim(),
+            }
+          : undefined
+      writeAuthProfile(provider, sanitized.modelConfig.apiKey, { profileName, metadata })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { ok: false, error: `Credentials write failed: ${message}` }
+    }
+  }
+  if (sanitized.modelConfig.provider === 'copilot-proxy') {
+    try {
+      writeAuthProfileToken('copilot-proxy:local', 'copilot-proxy', 'n/a')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { ok: false, error: `Credentials write failed: ${message}` }
+    }
+  }
+  return { ok: true }
+}
+
+/** Merge wizard-style model selection into existing `openclaw.json` (settings editor; preserves gateway/channels/etc.). */
+export type ModelSettingsTarget =
+  | { kind: 'defaults' }
+  | { kind: 'agent'; agentId: string }
+
+export function mergeModelIntoOpenClawConfig(
+  base: OpenClawConfig,
+  state: WizardState,
+  target: ModelSettingsTarget,
+): OpenClawConfig {
+  const sanitized = sanitizeWizardState(state)
+  const modelId = sanitized.modelConfig.modelId.trim()
+  if (!modelId) {
+    throw new Error('Model ID is required')
+  }
+
+  const rawProvider = sanitized.modelConfig.provider
+  const providerId =
+    rawProvider === 'custom'
+      ? (sanitized.modelConfig.customProviderId || 'custom').trim() || 'custom'
+      : rawProvider === 'moonshot-cn'
+        ? 'moonshot'
+        : rawProvider
+
+  const modelRef = `${providerId}/${modelId}`
+  const primaryModelRef = providerId === 'minimax' ? modelId : modelRef
+
+  let config = JSON.parse(JSON.stringify(base)) as OpenClawConfig
+
+  if (sanitized.modelConfig.provider === 'custom') {
+    const baseUrl = sanitized.modelConfig.customBaseUrl?.trim()
+    const compatibility = sanitized.modelConfig.customCompatibility ?? 'openai'
+    const api = compatibility === 'anthropic' ? 'anthropic-messages' : 'openai-completions'
+    if (baseUrl) {
+      const thirdPartyAnthropic =
+        compatibility === 'anthropic' && !baseUrl.includes('api.anthropic.com')
+      const customModelRef = `${providerId}/${modelId}`
+      config.agents = config.agents ?? {}
+      config.agents.defaults = config.agents.defaults ?? {}
+      config.agents.defaults.models = {
+        ...(config.agents.defaults.models ?? {}),
+        [customModelRef]: {
+          alias: modelId,
+        },
+      }
+      config.models = config.models ?? {}
+      config.models.mode = config.models.mode ?? 'merge'
+      config.models.providers = config.models.providers ?? {}
+      const existingCustom = (config.models.providers[providerId] ?? {}) as ModelProviderConfig
+      const apiKeyTrim = sanitized.modelConfig.apiKey.trim()
+      config.models.providers[providerId] = {
+        ...existingCustom,
+        baseUrl,
+        api,
+        ...(apiKeyTrim ? { apiKey: apiKeyTrim } : {}),
+        ...(thirdPartyAnthropic ? { authHeader: true } : {}),
+        models: [buildDefaultProviderModel(modelId || 'default')],
+      }
+    }
+  } else {
+    ensureProviderSeedConfig(config, sanitized)
+  }
+
+  if (target.kind === 'defaults') {
+    config.agents = config.agents ?? {}
+    config.agents.defaults = config.agents.defaults ?? {}
+    const existingModel = config.agents.defaults.model
+    const fallbacks =
+      typeof existingModel === 'object' &&
+      existingModel &&
+      !Array.isArray(existingModel) &&
+      Array.isArray((existingModel as { fallbacks?: string[] }).fallbacks)
+        ? (existingModel as { fallbacks: string[] }).fallbacks
+        : undefined
+    config.agents.defaults.model = {
+      primary: primaryModelRef,
+      ...(Array.isArray(fallbacks) && fallbacks.length ? { fallbacks } : {}),
+    }
+  } else {
+    const agents = config.agents ?? {}
+    const list = Array.isArray((agents as { list?: unknown[] }).list)
+      ? [...((agents as { list: unknown[] }).list)]
+      : []
+    const idx = list.findIndex((a) => {
+      const o = a as Record<string, unknown>
+      return String(o.id ?? '') === target.agentId
+    })
+    if (idx < 0) {
+      throw new Error(`Agent not found: ${target.agentId}`)
+    }
+    const prev = list[idx] as Record<string, unknown>
+    list[idx] = { ...prev, model: primaryModelRef }
+    config.agents = { ...agents, list: list as AgentListEntry[] }
+  }
+
+  const providerForAuth = sanitized.modelConfig.provider
+  if (
+    sanitized.modelConfig.provider !== 'custom' &&
+    (API_KEY_PROVIDER_SET.has(providerForAuth) || providerForAuth === 'moonshot-cn') &&
+    sanitized.modelConfig.apiKey.trim()
+  ) {
+    const authProviderId = resolveAuthProviderId(sanitized.modelConfig.provider)
+    const profileName = providerForAuth === 'minimax' ? 'global' : 'default'
+    const profileId = `${authProviderId}:${profileName}`
+    config.auth = {
+      ...(config.auth ?? {}),
+      profiles: {
+        ...(config.auth?.profiles ?? {}),
+        [profileId]: {
+          provider: authProviderId,
+          mode: 'api_key',
+        },
+      },
+      order: { ...(config.auth?.order ?? {}) },
+    }
+    config = addProfileToAuthOrder(config, authProviderId, profileId)
+  }
+  if (providerForAuth === 'copilot-proxy') {
+    config.auth = {
+      ...(config.auth ?? {}),
+      profiles: {
+        ...(config.auth?.profiles ?? {}),
+        'copilot-proxy:local': {
+          provider: 'copilot-proxy',
+          mode: 'token',
+        },
+      },
+      order: {
+        ...(config.auth?.order ?? {}),
+        'copilot-proxy': ['local'],
+      },
+    }
+    config.plugins = {
+      ...((config.plugins as Record<string, unknown>) ?? {}),
+      entries: {
+        ...((config.plugins as Record<string, unknown>)?.entries as Record<string, unknown> ?? {}),
+        'copilot-proxy': { enabled: true },
+      },
+    }
+  }
+
+  return config
+}
+
 export async function handleWizardCompleteSetup(
   state: WizardState,
   deps: SetupDeps,
@@ -630,45 +822,13 @@ export async function handleWizardCompleteSetup(
   }
 
   // 2. Write auth-profiles.json (skip for custom provider; stored in openclaw.json)
-  if (
-    sanitized.modelConfig.provider !== 'custom' &&
-    (API_KEY_PROVIDER_SET.has(sanitized.modelConfig.provider) || sanitized.modelConfig.provider === 'moonshot-cn') &&
-    sanitized.modelConfig.apiKey.trim()
-  ) {
-    try {
-      const provider = resolveAuthProviderId(sanitized.modelConfig.provider)
-      const profileName = sanitized.modelConfig.provider === 'minimax' ? 'global' : 'default'
-      const metadata =
-        sanitized.modelConfig.provider === 'cloudflare-ai-gateway' &&
-          sanitized.modelConfig.cloudflareAccountId?.trim() &&
-          sanitized.modelConfig.cloudflareGatewayId?.trim()
-          ? {
-              accountId: sanitized.modelConfig.cloudflareAccountId.trim(),
-              gatewayId: sanitized.modelConfig.cloudflareGatewayId.trim(),
-            }
-          : undefined
-      writeAuthProfile(provider, sanitized.modelConfig.apiKey, { profileName, metadata })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error('[wizard] Auth profile write failed:', message)
-      return {
-        ok: false,
-        error: `Credentials write failed: ${message}`,
-        phase: 'auth',
-      }
-    }
-  }
-  if (sanitized.modelConfig.provider === 'copilot-proxy') {
-    try {
-      writeAuthProfileToken('copilot-proxy:local', 'copilot-proxy', 'n/a')
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error('[wizard] Copilot-proxy auth profile write failed:', message)
-      return {
-        ok: false,
-        error: `Credentials write failed: ${message}`,
-        phase: 'auth',
-      }
+  const credResult = writeAuthCredentialsForModelState(sanitized)
+  if (!credResult.ok) {
+    console.error('[wizard] Auth profile write failed:', credResult.error)
+    return {
+      ok: false,
+      error: credResult.error,
+      phase: 'auth',
     }
   }
 
