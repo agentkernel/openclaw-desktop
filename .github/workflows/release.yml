@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: '要发布的 Git 标签（须已存在），须与 package.json 的 version 一致并加前缀 v，例如 v0.6.3+openclaw.2026.3.31。必填：工作流会检出该标签再构建，勿留空（留空会误用当前分支导致安装包混拼 / Control UI 黑屏）。'
+        description: '要发布的 Git 标签（须已存在），须与 package.json 的 version 一致并加前缀 v，例如 v0.6.4+openclaw.2026.3.31。必填：工作流会检出该标签再构建，勿留空（留空会误用当前分支导致安装包混拼 / Control UI 黑屏）。'
         required: true
         type: string
 
@@ -40,7 +40,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           if [ -z "${{ github.event.inputs.tag }}" ]; then
-            echo "::error::手动发布时必须在输入框填写 tag（与 Git 标签一致，例如 v0.6.3+openclaw.2026.3.31）。否则会按当前分支打包，极易与 Release 标签错配并导致安装包内 OpenClaw / Control UI 混拼。"
+            echo "::error::手动发布时必须在输入框填写 tag（与 Git 标签一致，例如 v0.6.4+openclaw.2026.3.31）。否则会按当前分支打包，极易与 Release 标签错配并导致安装包内 OpenClaw / Control UI 混拼。"
             exit 1
           fi
 

@@ -4,6 +4,13 @@ All notable changes to OpenClaw Desktop will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-04-03
+
+### Fixed
+
+- **主界面 / Control UI / Internal Server Error（续）：** 上游 `checkBrowserOrigin` 在 **WebSocket** 上若 **`Origin` 缺失或为字面量 `null`** 会直接拒绝（早于 loopback 放行）。Electron 内嵌 iframe 可能出现该情况。现于主进程 **`webRequest.onBeforeSendHeaders`** 对发往本机网关端口的环回请求补全 `Origin`（`gateway-request-origin.ts`、`index.ts`）。对 **`gateway.bind` 为 loopback 或未设置** 且 **`gateway.controlUi.allowedOrigins` 未配置或为空数组** 的配置，迁移与写盘合并 **`allowedOrigins: ["*"]`**（与上游 allowlist 逻辑一致；不覆盖用户已有非空列表）。**向导**在 **`bind === 'loopback'`** 时生成的 `openclaw.json` 同步写入上述 `allowedOrigins`（`setup-handler.ts`）。
+- **打包：** `prepare-bundle` 复制随包 OpenClaw 后 **移除 `dist/extensions/amazon-bedrock`**，该扩展依赖未打入安装包的 `@aws-sdk/client-bedrock`，否则会每次启动刷屏告警（`prepare-bundle.ts`）。
+
 ## [0.6.3] - 2026-04-02
 
 ### Fixed

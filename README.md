@@ -48,18 +48,18 @@ If you've been searching for *how to install OpenClaw on Windows*, *how to run O
 ## Quick Start
 
 1. Download the latest installer from [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest)
-2. Run the Windows setup (filename follows `package.json`, e.g. `OpenClaw-Setup-0.6.3+openclaw.2026.3.31.exe`)
+2. Run the Windows setup (filename follows `package.json`, e.g. `OpenClaw-Setup-0.6.4+openclaw.2026.3.31.exe`)
 3. Finish the setup wizard (provider → channel → gateway)
 4. Launch from Start Menu or Desktop shortcut
 
 **System:** Windows 10/11 x64 · ~350 MB free space · Internet for API calls
 
-## OpenClaw Desktop v0.6.3
+## OpenClaw Desktop v0.6.4
 
-- **Shell version:** `0.6.3+openclaw.2026.3.31` (semver + bundled OpenClaw pin in build metadata).
-- **Git release tag:** `v0.6.3+openclaw.2026.3.31` — same as `package.json` `version` with a `v` prefix (OpenClaw pin visible in the tag).
+- **Shell version:** `0.6.4+openclaw.2026.3.31` (semver + bundled OpenClaw pin in build metadata).
+- **Git release tag:** `v0.6.4+openclaw.2026.3.31` — same as `package.json` `version` with a `v` prefix (OpenClaw pin visible in the tag).
 - **Bundled OpenClaw (npm):** **2026.3.31** — same runtime as `npm install openclaw@2026.3.31` (current npm `latest`); pinned in [`package.json`](package.json) as `openclawBundleVersion`.
-- **Desktop highlights (recent train):** **v0.6.3** hardens **embedded Control UI** config: missing `gateway` in `openclaw.json` no longer skips the **2026.3.x** iframe flags, every **`writeOpenClawConfig`** path merges them, and config writes **retry** on transient Windows file locks — see [CHANGELOG **0.6.3**](CHANGELOG.md). **v0.6.2** documents **Git tags with bundled OpenClaw** (e.g. `v0.6.2+openclaw.2026.3.31`, [CHANGELOG **0.6.2**](CHANGELOG.md)). **v0.6.1** fixed Control UI **500 / device-identity** ([**0.6.1**](CHANGELOG.md)). **v0.6.0** fixed stub `package.json` / `prepare-bundle` ([**0.6.0**](CHANGELOG.md)). Feishu `registerFull` guard; MiniMax **M2.7-only**; Control UI from GitHub tag sources for Electron.
+- **Desktop highlights (recent train):** **v0.6.4** completes the **embedded Control UI / HTTP 500** hardening: **Origin** injection for loopback gateway requests, **`allowedOrigins: ["*"]`** seed on loopback when unset/empty, wizard parity for **loopback** bind, and **amazon-bedrock** extension stripped from the installer bundle (missing AWS SDK). See [CHANGELOG **0.6.4**](CHANGELOG.md). **v0.6.3** merged iframe auth flags on read/write + write retries ([**0.6.3**](CHANGELOG.md)). **v0.6.2** documents **Git tags with bundled OpenClaw** ([**0.6.2**](CHANGELOG.md)). Feishu `registerFull` guard; MiniMax **M2.7-only**; Control UI from GitHub tag sources for Electron.
 
 ### Upstream OpenClaw 2026.3.31 (summary)
 
@@ -133,8 +133,8 @@ OpenClaw Desktop is a **community-maintained Windows distribution** for the Open
 
 | | |
 |---|---|
-| **Release tag** | `v0.6.3+openclaw.2026.3.31` (equals `v` + `package.json` `version`) |
-| **Installer** | `OpenClaw-Setup-0.6.3+openclaw.2026.3.31.exe` (see [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest) for exact asset) |
+| **Release tag** | `v0.6.4+openclaw.2026.3.31` (equals `v` + `package.json` `version`) |
+| **Installer** | `OpenClaw-Setup-0.6.4+openclaw.2026.3.31.exe` (see [Releases](https://github.com/agentkernel/openclaw-desktop/releases/latest) for exact asset) |
 | **Platform** | Windows 10/11 x64 |
 | **Includes** | Electron shell, portable Node.js, bundled OpenClaw |
 | **Extras** | SHA-256 checksum, `latest.yml` for in-app updates |
@@ -221,7 +221,7 @@ pnpm run prepare-bundle
 pnpm run package:win   # Output: dist/OpenClaw-Setup-<version>.exe
 ```
 
-**Bundled OpenClaw:** Pinned in `package.json` (`openclawBundleVersion`). After `prepare-bundle`, see `bundledOpenClawVersion` in [`resources/bundle-manifest.json`](resources/bundle-manifest.json) (currently **2026.3.31** for desktop **v0.6.3**). Local checks: `pnpm run check-openclaw-versions` (omit `OPENCLAW_SKIP_NPM_LATEST_CHECK` to also compare against npm `latest`).
+**Bundled OpenClaw:** Pinned in `package.json` (`openclawBundleVersion`). After `prepare-bundle`, see `bundledOpenClawVersion` in [`resources/bundle-manifest.json`](resources/bundle-manifest.json) (currently **2026.3.31** for desktop **v0.6.4**). Local checks: `pnpm run check-openclaw-versions` (omit `OPENCLAW_SKIP_NPM_LATEST_CHECK` to also compare against npm `latest`).
 
 **Related docs:** [CHANGELOG.md](CHANGELOG.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
 

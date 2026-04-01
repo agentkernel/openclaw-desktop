@@ -460,9 +460,11 @@ function buildOpenClawConfig(state: WizardState): OpenClawConfig {
         token: state.gatewayConfig.authToken,
       },
       // Upstream 2026.3+: Control UI device-identity + loopback policy; embedded iframe needs both flags.
+      // WebSocket origin checks: loopback bind also seeds allowedOrigins so Electron iframe passes checkBrowserOrigin.
       controlUi: {
         allowInsecureAuth: true,
         dangerouslyDisableDeviceAuth: true,
+        ...(state.gatewayConfig.bind === 'loopback' ? { allowedOrigins: ['*'] } : {}),
       },
     },
     agents: {
