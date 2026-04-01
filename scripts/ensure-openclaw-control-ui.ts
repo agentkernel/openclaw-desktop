@@ -343,6 +343,14 @@ export async function downloadAndBuildOpenClawControlUiAt(
       env: { ...process.env, NODE_ENV: '' },
     })
 
+    // Vite bundles `../src/**`; upstream imports `zod` but `ui/package.json` may not list it — Rolldown fails CI otherwise.
+    console.log('  [control-ui] npm install zod (shared src peer for bundler)...')
+    execSync('npm install zod@^4 --no-audit --no-fund', {
+      cwd: uiDest,
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: '' },
+    })
+
     console.log('  [control-ui] vite build → dist/control-ui')
     execSync('npm run build', {
       cwd: uiDest,

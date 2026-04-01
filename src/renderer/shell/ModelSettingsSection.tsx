@@ -129,6 +129,7 @@ export function ModelSettingsSection() {
       modelConfig.cloudflareAccountId,
       modelConfig.cloudflareGatewayId,
       modelConfig.customBaseUrl,
+      modelConfig.customCompatibility,
       modelConfig.customProviderId,
       modelConfig.moonshotRegion,
     ],

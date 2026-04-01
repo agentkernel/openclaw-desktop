@@ -4,8 +4,13 @@
  */
 
 import { app } from 'electron'
-import { autoUpdater, CancellationToken, type ProgressInfo } from 'electron-updater'
-import type { UpdateInfo } from 'builder-util-runtime'
+import {
+  autoUpdater,
+  CancellationToken,
+  type ProgressInfo,
+  type UpdateFileInfo,
+  type UpdateInfo,
+} from 'electron-updater'
 import { IPC_UPDATE_AVAILABLE, IPC_UPDATE_PROGRESS } from '../../shared/ipc-channels.js'
 import type { UpdateCheckResult } from '../../shared/types.js'
 
@@ -25,10 +30,10 @@ function installerDownloadUrlFromUpdateInfo(info: UpdateInfo): string | undefine
   const files = info.files
   if (!files?.length) return undefined
   const bySetup = files.find(
-    (f) => /\.exe$/i.test(f.url) && f.url.toLowerCase().includes('setup'),
+    (f: UpdateFileInfo) => /\.exe$/i.test(f.url) && f.url.toLowerCase().includes('setup'),
   )
   if (bySetup) return bySetup.url
-  const exe = files.find((f) => /\.exe$/i.test(f.url))
+  const exe = files.find((f: UpdateFileInfo) => /\.exe$/i.test(f.url))
   return exe?.url
 }
 
