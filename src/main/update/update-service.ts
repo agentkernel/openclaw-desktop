@@ -63,7 +63,7 @@ function normalizeVersion(tag: string): string {
 }
 
 /**
- * Shell versions use semver plus build metadata (e.g. `0.6.1+openclaw.2026.3.31`).
+ * Shell versions use semver plus build metadata (e.g. `0.6.2+openclaw.2026.3.31`).
  * Semver ignores build metadata for precedence; we tie-break with a full string compare.
  * Returns negative if a is older than b.
  */

@@ -4,6 +4,12 @@ All notable changes to OpenClaw Desktop will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-04-01
+
+### Changed
+
+- **发布与 Git 标签：** 自本版起，**发行版 Git 标签**与根目录 `package.json` 的 **`version` 字段一致并加前缀 `v`**，例如 **`v0.6.2+openclaw.2026.3.31`**，后缀 **`+openclaw.<捆绑 OpenClaw 版本>`** 与钉扎 `openclawBundleVersion` 对齐，便于对照安装包内捆绑运行时。手动触发 `Release` 工作流时请在输入框填写**完整标签名**（含 `+`）；PowerShell 下若命令行打 tag，请给标签加引号。
+
 ## [0.6.1] - 2026-04-01
 
 ### Fixed
